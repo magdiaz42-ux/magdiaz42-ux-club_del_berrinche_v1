@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iniciar sesión | El Club del Berrinche</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="login-body">
+  <div class="overlay"></div>
+
+  <div class="contenedor-login">
+    <h1>El Club del Berrinche</h1>
+    <p>Ingresá tu correo o teléfono para acceder</p>
+
+    <form id="loginForm">
+      <input id="usuario" name="usuario" class="input" placeholder="Correo o teléfono" required />
+      <input id="password" name="password" type="password" class="input" placeholder="Contraseña" required />
+      <button type="submit" class="btn-login">Entrar</button>
+    </form>
+
+    <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+    <p><a href="registro/registro_etapa1.html">¿Todavía no tenés cuenta? Registrate acá</a></p>
+  </div>
+
+  <script>
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const usuario = document.getElementById("usuario").value.trim().toLowerCase();
+      const password = document.getElementById("password").value.trim();
+
+      if (!usuario || !password) {
+        alert("⚠️ Ingresá tus datos correctamente.");
+        return;
+      }
+
+      // Simulación de roles (hasta agregar PHP)
+      let rol = "cliente";
+      if (usuario.includes("admin")) rol = "admin";
+      else if (usuario.includes("dj")) rol = "dj";
+      else if (usuario.includes("cajero")) rol = "cajero";
+      else if (usuario.includes("karaoke")) rol = "karaoke";
+      else if (usuario.includes("cine")) rol = "cine";
+      else if (usuario.includes("juego")) rol = "juegos";
+
+      localStorage.setItem("usuario", usuario);
+      localStorage.setItem("rol", rol);
+      localStorage.setItem("isLogged", "true");
+
+      switch (rol) {
+        case "admin": window.location.href = "panel_admin/panel_admin.html"; break;
+        case "dj": window.location.href = "panel_dj/panel_dj.html"; break;
+        case "cajero": window.location.href = "panel_cajero/panel_cajero.html"; break;
+        case "karaoke": window.location.href = "panel_karaoke/panel_karaoke.html"; break;
+        case "cine": window.location.href = "panel_cine/panel_cine.html"; break;
+        case "juegos": window.location.href = "panel_juegos/panel_juegos.html"; break;
+        default: window.location.href = "panel_cliente/panel_cliente.html";
+      }
+    });
+  </script>
+</body>
+</html>

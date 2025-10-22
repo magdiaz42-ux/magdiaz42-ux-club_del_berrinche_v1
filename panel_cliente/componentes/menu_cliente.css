@@ -1,0 +1,133 @@
+/* === MENU CLIENTE (ESTILOS GLOBALES) === */
+
+.menu-btn {
+  position: fixed;
+  top: 25px;
+  left: 15px;
+  z-index: 200;
+  cursor: pointer;
+  width: 50px;
+  height: 40px;
+  background: rgba(10, 10, 20, 0.95);
+  border-right: 1px solid rgba(0,255,242,0.4);
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 20px rgba(0,255,242,0.25);
+  transition: all 0.4s ease;
+}
+
+.menu-btn:hover {
+  background: rgba(20, 20, 40, 1);
+  box-shadow: 0 0 25px rgba(0,255,242,0.5);
+  transform: scale(1.05);
+}
+
+.menu-btn div {
+  width: 24px;
+  height: 3px;
+  background: #00fff2;
+  border-radius: 2px;
+  margin: 3px 0;
+  transition: all 0.3s ease;
+}
+
+/* Animación del ícono (X al abrir) */
+.menu-btn.active div:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 5px);
+}
+.menu-btn.active div:nth-child(2) {
+  opacity: 0;
+}
+.menu-btn.active div:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px; /* completamente oculto al inicio */
+  width: 260px;
+  height: 100%;
+  background: rgba(10, 10, 20, 0.95);
+  box-shadow: 0 0 50px rgba(0,255,242,0.25);
+  transition: left 0.4s ease;
+  z-index: 150;
+  padding: 25px 20px 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid rgba(0,255,242,0.25);
+  box-sizing: border-box;
+}
+
+.sidebar.active {
+  left: 0; /* visible solo al abrir */
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 2px solid #00fff2;
+  object-fit: cover;
+  box-shadow: 0 0 20px rgba(0,255,242,0.4);
+  margin-bottom: 10px;
+}
+
+.nombre-usuario {
+  color: #00fff2;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.menu-links button {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(0,255,242,0.3);
+  border-radius: 25px;
+  color: #fff;
+  padding: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.menu-links button:hover {
+  background: linear-gradient(90deg, #0037ff, #00fff2);
+  box-shadow: 0 0 20px rgba(0,255,242,0.4);
+  transform: scale(1.05);
+}
+
+.logout-btn {
+  width: 100%;
+  background: rgba(255,0,0,0.1);
+  border: 1px solid rgba(255,60,60,0.4);
+  border-radius: 25px;
+  color: #ff8080;
+  font-weight: 600;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(90deg, #ff0040, #ff8080);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255,80,80,0.5);
+  transform: scale(1.05);
+}

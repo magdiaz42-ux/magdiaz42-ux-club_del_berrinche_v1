@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro - Etapa 2 | El Club del Berrinche</title>
+
+  <!-- Estilos base -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: url("../assets/img/fondo-hexagonos.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(2px);
+    }
+
+    .contenedor {
+      position: relative;
+      background: rgba(10, 10, 20, 0.9);
+      border-radius: 35px;
+      padding: 45px 50px;
+      width: 90%;
+      max-width: 720px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(0, 255, 242, 0.3), 0 0 100px rgba(106, 0, 255, 0.25);
+      border: 1px solid rgba(0, 255, 242, 0.25);
+      z-index: 2;
+    }
+
+    h1 {
+      color: #00fff2;
+      text-shadow: 0 0 25px #00fff2, 0 0 40px #4b00ff;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      margin-bottom: 8px;
+    }
+
+    .subtitulo {
+      color: #ccc;
+      margin-bottom: 25px;
+      font-size: 1rem;
+    }
+
+    /* === VIDEO / PREVIEW === */
+    .video-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid rgba(0, 255, 242, 0.4);
+      box-shadow: 0 0 25px rgba(0, 255, 242, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    video, #preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    /* === BOTONES === */
+    .botones {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #0037ff, #00fff2);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 12px 35px;
+      border-radius: 25px;
+      box-shadow: 0 0 25px rgba(0, 255, 242, 0.5);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-transform: uppercase;
+      font-size: 1rem;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 40px rgba(0, 255, 242, 0.8);
+    }
+
+    /* === AVATARES === */
+    .separador {
+      margin: 25px 0 15px;
+      font-weight: 500;
+      color: #00fff2;
+      text-shadow: 0 0 15px #00fff2;
+    }
+
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 18px;
+      justify-items: center;
+      margin-bottom: 30px;
+    }
+
+    .avatar-opcion {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 242, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      object-fit: cover;
+    }
+
+    .avatar-opcion:hover {
+      transform: scale(1.05);
+      border-color: #00fff2;
+      box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
+    }
+
+    .avatar-opcion.seleccionado {
+      border-color: #00fff2;
+      box-shadow: 0 0 35px rgba(0, 255, 242, 0.8);
+      transform: scale(1.07);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 600px) {
+      .contenedor {
+        padding: 35px 25px;
+      }
+      .video-container {
+        width: 250px;
+        height: 250px;
+      }
+      .avatar-opcion {
+        width: 75px;
+        height: 75px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+
+  <div class="contenedor">
+    <h1>Mostrate un poco</h1>
+    <p class="subtitulo">Sacate una selfie o elegí tu avatar</p>
+
+    <!-- Cámara / preview -->
+    <div id="videoContainer" class="video-container">
+      <video id="video" autoplay playsinline></video>
+      <img id="preview" alt="Vista previa" style="display:none;" />
+    </div>
+
+    <!-- Botones de cámara -->
+    <div class="botones">
+      <button class="btn" id="btnCapturar">📸 Capturar</button>
+      <button class="btn" id="btnReintentar" style="display:none;">🔁 Reintentar</button>
+    </div>
+
+    <p class="separador">O elegí un avatar</p>
+
+    <!-- Avatares -->
+    <div class="avatar-grid">
+      <img src="../assets/img/avatars/avatar1.png" class="avatar-opcion" data-avatar="../assets/img/avatars/avatar1.png" alt="Avatar 1">
+      <img src="../assets/img/avatars/avatar2.png" class="avatar-opcion" data-avatar="../assets/img/avatars/avatar2.png" alt="Avatar 2">
+      <img src="../assets/img/avatars/avatar3.png" class="avatar-opcion" data-avatar="../assets/img/avatars/avatar3.png" alt="Avatar 3">
+      <img src="../assets/img/avatars/avatar4.png" class="avatar-opcion" data-avatar="../assets/img/avatars/avatar4.png" alt="Avatar 4">
+      <img src="../assets/img/avatars/avatar5.png" class="avatar-opcion" data-avatar="../assets/img/avatars/avatar5.png" alt="Avatar 5">
+    </div>
+
+    <button id="btnContinuar" class="btn">Continuar</button>
+  </div>
+
+  <script>
+    // --- Validación de sesión ---
+    const codigoEntrada = localStorage.getItem("codigo_entrada");
+    const nombreUsuario = localStorage.getItem("nombre");
+
+    if (!codigoEntrada || !nombreUsuario) {
+      alert("⚠️ Sesión inválida. Volvé al inicio del registro.");
+      window.location.href = "registro_etapa1_datos.html";
+    }
+
+    const video = document.getElementById("video");
+    const preview = document.getElementById("preview");
+    const btnCapturar = document.getElementById("btnCapturar");
+    const btnReintentar = document.getElementById("btnReintentar");
+    const btnContinuar = document.getElementById("btnContinuar");
+
+    let selfieData = null;
+    let avatarSeleccionado = null;
+    let stream = null;
+
+    // --- Iniciar cámara ---
+    async function iniciarCamara() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        video.srcObject = stream;
+        video.style.display = "block";
+        preview.style.display = "none";
+        btnReintentar.style.display = "none";
+        btnCapturar.disabled = false;
+      } catch (err) {
+        console.warn("No se pudo acceder a la cámara:", err);
+        alert("⚠️ No se pudo acceder a la cámara. Podés elegir un avatar en su lugar.");
+      }
+    }
+
+    iniciarCamara();
+
+    // --- Capturar selfie ---
+    btnCapturar.addEventListener("click", () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.filter = "brightness(1.1) contrast(1.1)";
+      ctx.drawImage(video, 0, 0);
+      selfieData = canvas.toDataURL("image/png");
+
+      preview.src = selfieData;
+      preview.style.display = "block";
+      video.style.display = "none";
+      btnReintentar.style.display = "inline-block";
+      btnCapturar.disabled = true;
+
+      if (stream) stream.getTracks().forEach(t => t.stop());
+    });
+
+    // --- Reintentar selfie ---
+    btnReintentar.addEventListener("click", () => {
+      selfieData = null;
+      iniciarCamara();
+    });
+
+    // --- Elegir avatar ---
+    document.querySelectorAll(".avatar-opcion").forEach(img => {
+      img.addEventListener("click", () => {
+        document.querySelectorAll(".avatar-opcion").forEach(i => i.classList.remove("seleccionado"));
+        img.classList.add("seleccionado");
+        avatarSeleccionado = img.dataset.avatar;
+      });
+    });
+
+    // --- Continuar ---
+   btnContinuar.addEventListener("click", async () => {
+  if (!avatarSeleccionado && !selfieData) {
+    alert("⚠️ Tenés que sacarte una selfie o elegir un avatar antes de continuar.");
+    return;
+  }
+
+  const data = new FormData();
+  if (selfieData) data.append("selfieData", selfieData);
+  if (avatarSeleccionado) data.append("avatarSeleccionado", avatarSeleccionado);
+
+  try {
+    const resp = await fetch("../php/registro/registro_etapa2_selfie.php", {
+      method: "POST",
+      body: data
+    });
+    const text = await resp.text();
+
+    if (text.trim() === "OK") {
+      // Pasar a Etapa 3
+      window.location.href = "registro_etapa3_confirmacion.html";
+    } else {
+      alert("❌ " + text);
+    }
+  } catch (err) {
+    alert("Error al enviar los datos al servidor.");
+    console.error(err);
+  }
+});
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<script>
+  const form = document.getElementById("registroForm");
+  const btn = document.getElementById("btnContinuar");
+  const passwordError = document.getElementById("passwordError");
+  const codigoError = document.getElementById("codigoError");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    passwordError.style.display = "none";
+    codigoError.style.display = "none";
+
+    const pass = document.getElementById("password").value.trim();
+    const confirm = document.getElementById("confirmPassword").value.trim();
+    const codigo = document.getElementById("codigo_entrada").value.trim().toUpperCase();
+
+    if (pass.length < 6) {
+      passwordError.textContent = "⚠️ La contraseña debe tener al menos 6 caracteres.";
+      passwordError.style.display = "block";
+      btn.disabled = false;
+      return;
+    }
+    if (pass !== confirm) {
+      passwordError.textContent = "⚠️ Las contraseñas no coinciden.";
+      passwordError.style.display = "block";
+      btn.disabled = false;
+      return;
+    }
+    if (!/^[A-Z0-9]{5}$/.test(codigo)) {
+      codigoError.textContent = "⚠️ El código debe tener 5 caracteres alfanuméricos.";
+      codigoError.style.display = "block";
+      btn.disabled = false;
+      return;
+    }
+
+    // Construimos los datos para el PHP
+    const data = new FormData();
+    data.append("nombre_apodo", document.getElementById("nombre").value);
+    data.append("telefono", document.getElementById("codigoPais").value + document.getElementById("telefono").value);
+    data.append("email", document.getElementById("email").value);
+    data.append("password", pass);
+    data.append("codigo_5", codigo);
+
+    try {
+      const resp = await fetch("../php/registro/registro_etapa1_datos.php", {
+        method: "POST",
+        body: data
+      });
+      const text = await resp.text();
+
+      if (text.trim() === "OK") {
+        // Si todo fue bien, guardamos algunos datos para la siguiente etapa
+        localStorage.setItem("nombre", document.getElementById("nombre").value);
+        localStorage.setItem("telefono", document.getElementById("telefono").value);
+        localStorage.setItem("codigo_entrada", codigo);
+        localStorage.setItem("email", document.getElementById("email").value);
+
+        // Redirige a la Etapa 2
+        window.location.href = "registro_etapa2_selfie.html";
+      } else {
+        // Mostramos el mensaje de error devuelto por PHP
+        alert("⚠️ " + text);
+      }
+    } catch (err) {
+      alert("❌ Error al conectar con el servidor. Verificá que Apache y MySQL estén activos en XAMPP.");
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>

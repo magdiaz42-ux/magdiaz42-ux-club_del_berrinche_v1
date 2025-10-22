@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro - Etapa 3 | El Club del Berrinche</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css" />
+
+  <style>
+    body {
+      background: url("../assets/img/fondo-hexagonos.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 0;
+      backdrop-filter: blur(2px);
+    }
+
+    .contenedor {
+      position: relative;
+      z-index: 2;
+      background: rgba(10, 10, 20, 0.9);
+      border-radius: 40px;
+      padding: 50px 40px;
+      width: 90%;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(0,255,242,0.3), 0 0 100px rgba(106,0,255,0.25);
+      border: 1px solid rgba(0,255,242,0.25);
+      animation: fadeIn 0.8s ease-in-out;
+      overflow: hidden;
+    }
+
+    h1 {
+      color: #00fff2;
+      text-shadow: 0 0 25px #00fff2, 0 0 60px #4b00ff;
+      margin-bottom: 10px;
+      font-size: 1.9rem;
+    }
+
+    .subtitulo {
+      color: #ccc;
+      margin-bottom: 25px;
+      font-size: 1rem;
+    }
+
+    .preguntas-wrapper {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pregunta-container {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+      width: 100%;
+    }
+
+    .pregunta {
+      flex: 0 0 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .texto-pregunta {
+      color: #00fff2;
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px rgba(0, 255, 200, 0.7), 0 0 20px rgba(75, 0, 255, 0.4);
+      margin: 0 10px;
+    }
+
+    .opciones {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .opcion {
+      background: linear-gradient(90deg, #4b00ff, #00fff2);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 25px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(0, 255, 200, 0.4);
+    }
+
+    .opcion:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(0, 255, 242, 0.7);
+    }
+
+    .opcion.seleccionada {
+      border: 2px solid #7b2ff7;
+      box-shadow: 0 0 25px #7b2ff7;
+    }
+
+    .indicadores {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .indicador {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(0, 255, 200, 0.25);
+      transition: all 0.3s;
+    }
+
+    .indicador.activo {
+      background: #00fff2;
+      box-shadow: 0 0 10px #00fff2;
+    }
+
+    .botones-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .btn-navegacion,
+    .btn-finalizar {
+      background: linear-gradient(90deg, #0037ff, #00fff2);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 12px 35px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 25px rgba(0, 255, 242, 0.3);
+    }
+
+    .btn-navegacion:hover,
+    .btn-finalizar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 35px rgba(0, 255, 242, 0.5);
+    }
+
+    @media (max-width: 600px) {
+      .texto-pregunta { font-size: 1rem; }
+      .opcion { padding: 10px 20px; font-size: 0.9rem; }
+      .btn-navegacion, .btn-finalizar { padding: 10px 25px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+
+  <div class="contenedor">
+    <h1>Contanos de vos</h1>
+    <p class="subtitulo">Así te sumamos a las actividades del bar 🎉</p>
+
+    <div class="preguntas-wrapper">
+      <div id="preguntasWrapper" class="pregunta-container">
+
+        <div class="pregunta">
+          <div class="texto-pregunta">¿De los siguientes dulces cuál preferís?</div>
+          <div class="opciones">
+            <button class="opcion" data-rta="Team Membrillo">Team Membrillo</button>
+            <button class="opcion" data-rta="Team Batata">Team Batata</button>
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <div class="texto-pregunta">¿Qué comida te gusta más?</div>
+          <div class="opciones">
+            <button class="opcion" data-rta="Team Salado">Team Salado</button>
+            <button class="opcion" data-rta="Team Dulce">Team Dulce</button>
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <div class="texto-pregunta">¿Qué te gusta más?</div>
+          <div class="opciones">
+            <button class="opcion" data-rta="Team Invierno">Team Invierno</button>
+            <button class="opcion" data-rta="Team Verano">Team Verano</button>
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <div class="texto-pregunta">¿Preferís la noche o el día?</div>
+          <div class="opciones">
+            <button class="opcion" data-rta="Team Noche">Team Noche</button>
+            <button class="opcion" data-rta="Team Día">Team Día</button>
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <div class="texto-pregunta">¿Con quién venís más seguido al bar?</div>
+          <div class="opciones">
+            <button class="opcion" data-rta="Amigos">Con amigos</button>
+            <button class="opcion" data-rta="Pareja">Con mi pareja</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="indicadores" class="indicadores"></div>
+
+    <div class="botones-container">
+      <button id="btnAnterior" class="btn-navegacion">Anterior</button>
+      <button id="btnFinalizar" class="btn-finalizar" style="display:none;">Finalizar Registro</button>
+    </div>
+  </div>
+
+  <script>
+    // Validar que haya datos previos en localStorage
+    const codigoEntrada = localStorage.getItem("codigo_entrada");
+    const nombreUsuario = localStorage.getItem("nombre");
+
+    if (!codigoEntrada || !nombreUsuario) {
+      alert("⚠️ Sesión inválida. Volvé al inicio del registro.");
+      window.location.href = "registro_etapa1.html";
+    }
+
+    const preguntas = document.querySelectorAll(".pregunta");
+    const wrapper = document.getElementById("preguntasWrapper");
+    const indicadoresContainer = document.getElementById("indicadores");
+    const btnAnterior = document.getElementById("btnAnterior");
+    const btnFinalizar = document.getElementById("btnFinalizar");
+
+    let indice = 0;
+    let respuestas = [];
+
+    // Crear indicadores
+    preguntas.forEach((_, i) => {
+      const dot = document.createElement("div");
+      dot.classList.add("indicador");
+      if (i === 0) dot.classList.add("activo");
+      indicadoresContainer.appendChild(dot);
+    });
+    const indicadores = document.querySelectorAll(".indicador");
+
+    // Selección de opciones
+    document.querySelectorAll(".opcion").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const preguntaCont = btn.closest(".pregunta");
+        preguntaCont.querySelectorAll(".opcion").forEach(o => o.classList.remove("seleccionada"));
+        btn.classList.add("seleccionada");
+
+        respuestas[indice] = {
+          pregunta: preguntaCont.querySelector(".texto-pregunta").textContent,
+          respuesta: btn.dataset.rta
+        };
+
+        setTimeout(() => {
+          if (indice < preguntas.length - 1) {
+            indice++;
+            actualizarVista();
+          } else {
+            btnFinalizar.style.display = "inline-block";
+          }
+        }, 250);
+      });
+    });
+
+    function actualizarVista() {
+      wrapper.style.transform = `translateX(-${indice * 100}%)`;
+      indicadores.forEach((i, idx) => i.classList.toggle("activo", idx === indice));
+      btnAnterior.style.display = indice === 0 ? "none" : "inline-block";
+      btnFinalizar.style.display = indice === preguntas.length - 1 ? "inline-block" : "none";
+    }
+
+    btnAnterior.addEventListener("click", () => {
+      if (indice > 0) indice--;
+      actualizarVista();
+    });
+
+    btnFinalizar.addEventListener("click", () => {
+      localStorage.setItem("respuestasQuiz", JSON.stringify(respuestas));
+     const payload = {
+  nombre: localStorage.getItem("nombre"),
+  codigoPais: localStorage.getItem("codigoPais"),
+  telefono: localStorage.getItem("telefono"),
+  email: localStorage.getItem("email"),
+  codigo_entrada: localStorage.getItem("codigo_entrada"),
+  password: localStorage.getItem("password"),
+  usuarioAvatar: localStorage.getItem("usuarioAvatar"),
+  respuestasQuiz: JSON.parse(localStorage.getItem("respuestasQuiz"))
+};
+
+fetch("../php/registro/registro_etapa3_confirmacion.php", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+})
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("🎉 ¡Registro completo! Tus datos fueron guardados correctamente.");
+      localStorage.clear();
+      window.location.href = "../panel_cliente/panel_cliente.html";
+    } else {
+      alert("⚠️ Error: " + data.message);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Error al conectar con el servidor.");
+  });
+
+
+    actualizarVista();
+  </script>
+</body>
+</html>

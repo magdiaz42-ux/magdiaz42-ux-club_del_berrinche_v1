@@ -1,0 +1,25 @@
+# === ARCHIVOS Y CARPETAS LOCALES ===
+/uploads/
+/vendor/
+/node_modules/
+/backup/
+/temp/
+.DS_Store
+Thumbs.db
+
+# === CONFIGURACIONES SENSIBLES ===
+/php/conexion_local.php
+/php/conexion_auto.php
+/php/conexion_remota.php
+
+# === ARCHIVOS TEMPORALES ===
+*.log
+*.tmp
+*.bak
+*.swp
+
+# === ENTORNO LOCAL ===
+/.idea/
+/.vscode/
+/xampp/
+/.env
