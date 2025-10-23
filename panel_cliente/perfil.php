@@ -12,7 +12,7 @@ if (!isset($_SESSION['id_usuario'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Perfil | El Club del Berrinche</title>
 
-  <!-- Fuentes y estilos generales -->
+  <!-- Fuentes y estilos -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="stylesheet" href="componentes/menu_cliente.css" />
@@ -137,7 +137,6 @@ if (!isset($_SESSION['id_usuario'])) {
       box-shadow: 0 0 25px rgba(0,255,242,0.6);
     }
 
-    /* === MODAL === */
     .modal {
       position: fixed;
       inset: 0;
@@ -198,11 +197,8 @@ if (!isset($_SESSION['id_usuario'])) {
 
 <body>
   <div class="overlay"></div>
-
-  <!-- ✅ Menú lateral desde el componente -->
   <?php include 'componentes/menu_cliente.php'; ?>
 
-  <!-- Contenedor del perfil -->
   <div class="perfil-container">
     <h1>Tu Perfil</h1>
     <div class="avatar-area">
@@ -229,7 +225,7 @@ if (!isset($_SESSION['id_usuario'])) {
     </form>
   </div>
 
-  <!-- Modal de cambio de avatar -->
+  <!-- Modal cambio de avatar -->
   <div class="modal" id="modalAvatar">
     <div class="modal-content">
       <h2>Elegí una opción</h2>
@@ -250,7 +246,37 @@ if (!isset($_SESSION['id_usuario'])) {
   <script src="componentes/menu_cliente.js" defer></script>
 
   <script>
-    // --- Modal y edición de perfil ---
+    // --- Cargar datos del perfil ---
+    async function cargarPerfil() {
+      try {
+        const res = await fetch("../php/panel_cliente/perfil_datos.php");
+        const data = await res.json();
+        console.log("Respuesta del servidor (perfil):", data);
+
+        if (!data.success) {
+          alert("⚠️ No se pudieron cargar los datos del perfil.");
+          return;
+        }
+
+        const nombre = data.data.nombre_apodo || data.data.nombre || "Sin nombre";
+        const telefono = data.data.telefono || "";
+        const email = data.data.email || "";
+        const avatarPath = data.data.selfie_avatar?.trim() || "../assets/img/avatars/avatar1.png";
+
+        document.getElementById("nombre").value = nombre;
+        document.getElementById("telefono").value = telefono;
+        document.getElementById("email").value = email;
+        document.getElementById("userAvatar").src = avatarPath;
+
+      } catch (err) {
+        console.error("Error al cargar el perfil:", err);
+        alert("Error de conexión con el servidor.");
+      }
+    }
+
+    cargarPerfil();
+
+    // --- Modal y edición ---
     const modal = document.getElementById("modalAvatar");
     const btnCambiarAvatar = document.getElementById("btnCambiarAvatar");
     const btnSelfie = document.getElementById("btnSelfie");

@@ -234,7 +234,6 @@
   </div>
 
   <script>
-    // Validar que haya datos previos en localStorage
     const codigoEntrada = localStorage.getItem("codigo_entrada");
     const nombreUsuario = localStorage.getItem("nombre");
 
@@ -252,7 +251,6 @@
     let indice = 0;
     let respuestas = [];
 
-    // Crear indicadores
     preguntas.forEach((_, i) => {
       const dot = document.createElement("div");
       dot.classList.add("indicador");
@@ -261,7 +259,6 @@
     });
     const indicadores = document.querySelectorAll(".indicador");
 
-    // Selección de opciones
     document.querySelectorAll(".opcion").forEach(btn => {
       btn.addEventListener("click", () => {
         const preguntaCont = btn.closest(".pregunta");
@@ -298,37 +295,38 @@
 
     btnFinalizar.addEventListener("click", () => {
       localStorage.setItem("respuestasQuiz", JSON.stringify(respuestas));
-     const payload = {
-  nombre: localStorage.getItem("nombre"),
-  codigoPais: localStorage.getItem("codigoPais"),
-  telefono: localStorage.getItem("telefono"),
-  email: localStorage.getItem("email"),
-  codigo_entrada: localStorage.getItem("codigo_entrada"),
-  password: localStorage.getItem("password"),
-  usuarioAvatar: localStorage.getItem("usuarioAvatar"),
-  respuestasQuiz: JSON.parse(localStorage.getItem("respuestasQuiz"))
-};
 
-fetch("../php/registro/registro_etapa3_confirmacion.php", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload)
-})
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      alert("🎉 ¡Registro completo! Tus datos fueron guardados correctamente.");
-      localStorage.clear();
-      window.location.href = "../panel_cliente/panel_cliente.html";
-    } else {
-      alert("⚠️ Error: " + data.message);
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("❌ Error al conectar con el servidor.");
-  });
+      const payload = {
+        nombre: localStorage.getItem("nombre"),
+        codigoPais: localStorage.getItem("codigoPais"),
+        telefono: localStorage.getItem("telefono"),
+        email: localStorage.getItem("email"),
+        codigo_entrada: localStorage.getItem("codigo_entrada"),
+        password: localStorage.getItem("password"),
+        usuarioAvatar: localStorage.getItem("usuarioAvatar"),
+        respuestasQuiz: JSON.parse(localStorage.getItem("respuestasQuiz"))
+      };
 
+      fetch("../php/registro/registro_etapa3_confirmacion.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert("🎉 ¡Registro completo! Tus datos fueron guardados correctamente.");
+            localStorage.clear();
+            window.location.href = "../panel_cliente/panel_cliente.php";
+          } else {
+            alert("⚠️ Error: " + data.message);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert("❌ Error al conectar con el servidor.");
+        });
+    });
 
     actualizarVista();
   </script>

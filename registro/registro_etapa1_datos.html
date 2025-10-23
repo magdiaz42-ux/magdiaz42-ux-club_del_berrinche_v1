@@ -1,71 +1,288 @@
-<script>
-  const form = document.getElementById("registroForm");
-  const btn = document.getElementById("btnContinuar");
-  const passwordError = document.getElementById("passwordError");
-  const codigoError = document.getElementById("codigoError");
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro - Etapa 1 | El Club del Berrinche</title>
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    btn.disabled = true;
-    passwordError.style.display = "none";
-    codigoError.style.display = "none";
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
 
-    const pass = document.getElementById("password").value.trim();
-    const confirm = document.getElementById("confirmPassword").value.trim();
-    const codigo = document.getElementById("codigo_entrada").value.trim().toUpperCase();
-
-    if (pass.length < 6) {
-      passwordError.textContent = "⚠️ La contraseña debe tener al menos 6 caracteres.";
-      passwordError.style.display = "block";
-      btn.disabled = false;
-      return;
-    }
-    if (pass !== confirm) {
-      passwordError.textContent = "⚠️ Las contraseñas no coinciden.";
-      passwordError.style.display = "block";
-      btn.disabled = false;
-      return;
-    }
-    if (!/^[A-Z0-9]{5}$/.test(codigo)) {
-      codigoError.textContent = "⚠️ El código debe tener 5 caracteres alfanuméricos.";
-      codigoError.style.display = "block";
-      btn.disabled = false;
-      return;
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      font-family: "Poppins", sans-serif;
+      background: url("../assets/img/fondo-hexagonos.jpg") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: #fff;
     }
 
-    // Construimos los datos para el PHP
-    const data = new FormData();
-    data.append("nombre_apodo", document.getElementById("nombre").value);
-    data.append("telefono", document.getElementById("codigoPais").value + document.getElementById("telefono").value);
-    data.append("email", document.getElementById("email").value);
-    data.append("password", pass);
-    data.append("codigo_5", codigo);
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 0;
+      backdrop-filter: blur(2px);
+    }
 
-    try {
-      const resp = await fetch("../php/registro/registro_etapa1_datos.php", {
-        method: "POST",
-        body: data
-      });
-      const text = await resp.text();
+    .contenedor {
+      position: relative;
+      z-index: 2;
+      background: rgba(10, 10, 20, 0.9);
+      border-radius: 40px;
+      box-shadow: 0 0 60px rgba(0,255,242,0.3), 0 0 100px rgba(106,0,255,0.25);
+      padding: 40px 45px;
+      width: 90%;
+      max-width: 550px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-in-out;
+      border: 1px solid rgba(0,255,242,0.25);
+    }
 
-      if (text.trim() === "OK") {
-        // Si todo fue bien, guardamos algunos datos para la siguiente etapa
-        localStorage.setItem("nombre", document.getElementById("nombre").value);
-        localStorage.setItem("telefono", document.getElementById("telefono").value);
-        localStorage.setItem("codigo_entrada", codigo);
-        localStorage.setItem("email", document.getElementById("email").value);
+    h1 {
+      color: #00fff2;
+      text-shadow: 0 0 25px #00fff2, 0 0 60px #4b00ff;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      margin-bottom: 5px;
+    }
 
-        // Redirige a la Etapa 2
-        window.location.href = "registro_etapa2_selfie.html";
-      } else {
-        // Mostramos el mensaje de error devuelto por PHP
-        alert("⚠️ " + text);
+    p.subtitulo {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+    }
+
+    label {
+      color: #00fff2;
+      font-weight: 600;
+      font-size: 0.95rem;
+      width: 40%;
+      text-align: left;
+      text-shadow: 0 0 10px rgba(0,255,242,0.3);
+    }
+
+    .required {
+      color: #ff4d4d;
+      margin-left: 4px;
+    }
+
+    .input, .phone-group input {
+      width: 60%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 2px solid rgba(0, 255, 242, 0.4);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      outline: none;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .input::placeholder, .phone-group input::placeholder { color: #bbb; }
+
+    .input:focus, .phone-group input:focus {
+      border-color: #00fff2;
+      box-shadow: 0 0 12px #00fff2;
+    }
+
+    .phone-group {
+      display: flex;
+      width: 60%;
+      gap: 5px;
+    }
+
+    .phone-group input:first-child {
+      width: 30%;
+      text-align: center;
+    }
+
+    .phone-group input:last-child {
+      width: 70%;
+    }
+
+    .error {
+      display: none;
+      color: #ff6961;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: -5px;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #0037ff, #00fff2);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 12px 35px;
+      border-radius: 25px;
+      box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 100%;
+      font-size: 1rem;
+      text-transform: uppercase;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 40px rgba(0, 255, 242, 0.8);
+    }
+
+    .nota {
+      text-align: center;
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+
+  <div class="contenedor">
+    <h1>Registro - Etapa 1</h1>
+    <p class="subtitulo">Completá tus datos para comenzar</p>
+
+    <form id="registroForm">
+      <div class="form-row">
+        <label for="nombre">Nombre o apodo<span class="required">*</span></label>
+        <input type="text" id="nombre" name="nombre_apodo" class="input" placeholder="Ej: Mag" required />
+      </div>
+
+      <div class="form-row">
+        <label for="telefono">Teléfono<span class="required">*</span></label>
+        <div class="phone-group">
+          <input type="text" id="codigoPais" value="+54" maxlength="4" class="input" />
+          <input type="tel" id="telefono" placeholder="11 1234 5678" class="input" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" class="input" placeholder="opcional" />
+      </div>
+
+      <div class="form-row">
+        <label for="password">Contraseña<span class="required">*</span></label>
+        <input type="password" id="password" class="input" placeholder="Mínimo 6 caracteres" required />
+      </div>
+
+      <div class="form-row">
+        <label for="confirmPassword">Confirmar<span class="required">*</span></label>
+        <input type="password" id="confirmPassword" class="input" required />
+      </div>
+      <div id="passwordError" class="error"></div>
+
+      <div class="form-row">
+        <label for="codigo_entrada">Código único<span class="required">*</span></label>
+        <input type="text" id="codigo_entrada" maxlength="5" class="input" placeholder="ABCDE" required style="text-transform: uppercase;" />
+      </div>
+      <div id="codigoError" class="error"></div>
+
+      <button type="submit" class="btn" id="btnContinuar">Continuar</button>
+      <p class="nota">* Campos obligatorios</p>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("registroForm");
+    const btn = document.getElementById("btnContinuar");
+    const passwordError = document.getElementById("passwordError");
+    const codigoError = document.getElementById("codigoError");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      passwordError.style.display = "none";
+      codigoError.style.display = "none";
+
+      const pass = document.getElementById("password").value.trim();
+      const confirm = document.getElementById("confirmPassword").value.trim();
+      const codigo = document.getElementById("codigo_entrada").value.trim().toUpperCase();
+
+      if (pass.length < 6) {
+        passwordError.textContent = "⚠️ La contraseña debe tener al menos 6 caracteres.";
+        passwordError.style.display = "block";
+        btn.disabled = false;
+        return;
       }
-    } catch (err) {
-      alert("❌ Error al conectar con el servidor. Verificá que Apache y MySQL estén activos en XAMPP.");
-      console.error(err);
-    } finally {
-      btn.disabled = false;
-    }
-  });
-</script>
+
+      if (pass !== confirm) {
+        passwordError.textContent = "⚠️ Las contraseñas no coinciden.";
+        passwordError.style.display = "block";
+        btn.disabled = false;
+        return;
+      }
+
+      if (!/^[A-Z0-9]{5}$/.test(codigo)) {
+        codigoError.textContent = "⚠️ El código debe tener 5 caracteres alfanuméricos.";
+        codigoError.style.display = "block";
+        btn.disabled = false;
+        return;
+      }
+
+      const data = new FormData();
+      data.append("nombre_apodo", document.getElementById("nombre").value.trim());
+      data.append("telefono", (document.getElementById("codigoPais")?.value || "+54") + document.getElementById("telefono").value.trim());
+      data.append("email", document.getElementById("email").value.trim().toLowerCase());
+      data.append("password", pass);
+      data.append("codigo_entrada", codigo);
+
+      try {
+        const resp = await fetch("../php/registro/registro_etapa1_datos.php", {
+          method: "POST",
+          body: data
+        });
+
+        const text = await resp.text();
+
+        if (text.trim() === "OK") {
+          localStorage.setItem("nombre", document.getElementById("nombre").value);
+          localStorage.setItem("telefono", document.getElementById("telefono").value);
+          localStorage.setItem("codigo_entrada", codigo);
+          localStorage.setItem("email", document.getElementById("email").value);
+
+          window.location.href = "registro_etapa2_selfie.html";
+        } else {
+          alert("⚠️ " + text);
+        }
+
+      } catch (err) {
+        alert("❌ Error al conectar con el servidor. Verificá que Apache y MySQL estén activos en XAMPP.");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

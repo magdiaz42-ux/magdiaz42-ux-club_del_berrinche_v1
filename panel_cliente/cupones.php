@@ -12,8 +12,7 @@ if (!isset($_SESSION['id_usuario'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tus Cupones | El Club del Berrinche</title>
 
-  <!-- Estilos globales y del menú -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="componentes/menu_cliente.css">
 
@@ -24,7 +23,6 @@ if (!isset($_SESSION['id_usuario'])) {
       background: url("../assets/img/fondo-hexagonos.jpg") no-repeat center center fixed;
       background-size: cover;
       color: #fff;
-      height: 100vh;
       overflow-y: auto;
     }
 
@@ -36,7 +34,6 @@ if (!isset($_SESSION['id_usuario'])) {
       z-index: 0;
     }
 
-    /* === CONTENEDOR PRINCIPAL === */
     .contenedor {
       position: relative;
       z-index: 2;
@@ -44,20 +41,25 @@ if (!isset($_SESSION['id_usuario'])) {
       border-radius: 25px;
       padding: 25px;
       width: 90%;
-      max-width: 700px;
-      margin: 80px auto 60px auto;
+      max-width: 1000px;
+      margin: 100px auto;
       box-shadow: 0 0 60px rgba(0,255,242,0.3), 0 0 100px rgba(106,0,255,0.25);
       border: 1px solid rgba(0,255,242,0.25);
-      transition: filter 0.3s ease;
+      transition: margin-left 0.3s ease, filter 0.3s ease;
+    }
+
+    .sidebar.active ~ .contenedor {
+      margin-left: 290px;
+      filter: brightness(0.9);
     }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 25px;
     }
 
     h1 {
@@ -73,11 +75,6 @@ if (!isset($_SESSION['id_usuario'])) {
       gap: 8px;
       justify-content: flex-end;
       flex-wrap: wrap;
-    }
-
-    .aplicar-codigo span {
-      color: #ccc;
-      font-size: 0.9rem;
     }
 
     .aplicar-codigo input {
@@ -110,25 +107,136 @@ if (!isset($_SESSION['id_usuario'])) {
       box-shadow: 0 0 20px rgba(0,255,242,0.5);
     }
 
-    .cupon {
-      background: rgba(255,255,255,0.05);
-      border: 1px dashed rgba(0,255,242,0.4);
-      border-radius: 15px;
-      padding: 15px;
-      margin-bottom: 20px;
-      text-align: left;
-      box-shadow: 0 0 15px rgba(0,255,242,0.2);
-      cursor: pointer;
-      transition: 0.3s;
+    /* === GRILLA === */
+    .grid-cupones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
     }
 
-    .cupon:hover { transform: scale(1.02); }
+    /* === CUPONES CURVADOS CON EFECTO 3D === */
+    .cupon {
+      position: relative;
+      padding: 18px 22px;
+      border-radius: 18px;
+      text-align: left;
+      cursor: pointer;
+      color: #fff;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -4px 10px rgba(0,0,0,0.25);
+      border: 2px solid rgba(255,255,255,0.2);
+      background: linear-gradient(145deg, #555, #333);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-    .cupon h3 { margin: 0; color: #00fff2; }
-    .cupon p { margin: 5px 0; color: #ccc; font-size: 0.95rem; }
+    .cupon:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(0,255,242,0.5);
+    }
 
-    .qr { display: none; text-align: center; margin-top: 10px; }
-    .qr img { width: 120px; height: 120px; }
+    /* === COLORES POR TIPO === */
+    .cupon.tipo-fijo {
+      background: linear-gradient(145deg, #ff4d6d, #c9184a);
+    }
+
+    .cupon.tipo-random {
+      background: linear-gradient(145deg, #ffd166, #ffb703);
+    }
+
+    .cupon.tipo-extra {
+      background: linear-gradient(145deg, #06d6a0, #118ab2);
+    }
+
+    /* Tipografía con efecto suave 3D */
+    .cupon h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .cupon p {
+      font-size: 0.9rem;
+      margin: 4px 0;
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .cupon .vencimiento {
+      font-size: 0.8rem;
+      margin-top: 6px;
+      color: rgba(255,255,255,0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    /* Bordes tipo ticket */
+    .cupon::before,
+    .cupon::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      background: rgba(0,0,0,0.85);
+      border-radius: 50%;
+    }
+
+    .cupon::before { left: -11px; }
+    .cupon::after { right: -11px; }
+
+    /* === POPUP === */
+    .popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(3px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup-content {
+      background: rgba(15,15,25,0.95);
+      border: 1px solid #00fff2;
+      border-radius: 20px;
+      padding: 30px 40px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(0,255,242,0.3);
+      max-width: 90%;
+    }
+
+    .popup-content h2 {
+      color: #00fff2;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .popup-content img {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 10px;
+    }
+
+    .popup-content button {
+      margin-top: 10px;
+      background: linear-gradient(90deg, #0037ff, #00fff2);
+      border: none;
+      border-radius: 25px;
+      padding: 8px 18px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .popup-content button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0,255,242,0.5);
+    }
 
     .btn-volver {
       background: linear-gradient(90deg, #0037ff, #00fff2);
@@ -139,7 +247,7 @@ if (!isset($_SESSION['id_usuario'])) {
       font-weight: 600;
       cursor: pointer;
       display: block;
-      margin: 20px auto 0 auto;
+      margin: 40px auto 10px auto;
       transition: 0.3s;
     }
 
@@ -152,45 +260,36 @@ if (!isset($_SESSION['id_usuario'])) {
 
 <body>
   <div class="overlay"></div>
-
-  <!-- ✅ Menú lateral desde el componente -->
   <?php include 'componentes/menu_cliente.php'; ?>
 
-  <!-- Contenedor principal -->
   <div class="contenedor" id="contenido">
     <header>
       <h1>🎟️ Tus Cupones</h1>
       <div class="aplicar-codigo">
-        <span>Aplicá tu nuevo código:</span>
         <input type="text" id="codigoInput" maxlength="5" placeholder="ABCDE">
         <button id="btnAplicar">Aplicar</button>
       </div>
     </header>
 
-    <div id="listaCupones">
+    <div id="listaCupones" class="grid-cupones">
       <p>Cargando cupones...</p>
     </div>
 
     <button class="btn-volver" onclick="window.location.href='panel_cliente.php'">Volver al Panel</button>
   </div>
 
-  <!-- Scripts -->
+  <div class="popup" id="popupQR">
+    <div class="popup-content">
+      <h2 id="popupTitulo"></h2>
+      <img id="popupQRimg" src="" alt="QR del Cupón">
+      <p id="popupCodigo"></p>
+      <button id="popupCerrar">Cerrar</button>
+    </div>
+  </div>
+
   <script src="componentes/menu_cliente.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
 
   <script>
-    // === CARGAR DATOS DEL USUARIO ===
-    fetch("../php/panel_cliente_datos.php")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const user = data.data;
-          document.getElementById("nombreUsuario").textContent = user.nombre_apodo || "Sin nombre";
-          document.getElementById("userAvatar").src = user.avatar || "../assets/img/avatars/avatar1.png";
-        }
-      });
-
-    // === CARGAR CUPONES ===
     async function cargarCupones() {
       const cont = document.getElementById("listaCupones");
       cont.innerHTML = "<p>Cargando cupones...</p>";
@@ -209,19 +308,15 @@ if (!isset($_SESSION['id_usuario'])) {
         data.cupones.forEach(c => {
           const div = document.createElement("div");
           div.classList.add("cupon");
+          div.classList.add(c.tipo === "fijo" ? "tipo-fijo" :
+                           c.tipo === "random" ? "tipo-random" : "tipo-extra");
+
           div.innerHTML = `
             <h3>${c.nombre}</h3>
-            <p>${c.descripcion}</p>
-            <p class="fecha">Asignado: ${c.fecha_asignacion}</p>
-            <div class="qr">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?data=${c.codigo_unico}&size=120x120" alt="QR Cupón">
-              <p>${c.codigo_unico}</p>
-            </div>
+            <p>${c.caracteristicas}</p>
+            <p class="vencimiento">Vence: ${c.fecha_vencimiento || "Sin fecha"}</p>
           `;
-          div.addEventListener("click", () => {
-            const qr = div.querySelector(".qr");
-            qr.style.display = qr.style.display === "block" ? "none" : "block";
-          });
+          div.addEventListener("click", () => abrirPopup(c));
           cont.appendChild(div);
         });
       } catch (err) {
@@ -230,7 +325,22 @@ if (!isset($_SESSION['id_usuario'])) {
       }
     }
 
-    // === APLICAR NUEVO CÓDIGO ===
+    const popup = document.getElementById("popupQR");
+    const popupTitulo = document.getElementById("popupTitulo");
+    const popupQRimg = document.getElementById("popupQRimg");
+    const popupCodigo = document.getElementById("popupCodigo");
+
+    function abrirPopup(cupon) {
+      popupTitulo.textContent = cupon.nombre;
+      popupQRimg.src = `https://api.qrserver.com/v1/create-qr-code/?data=${cupon.codigo_unico}&size=150x150`;
+      popupCodigo.textContent = cupon.codigo_unico;
+      popup.style.display = "flex";
+    }
+
+    document.getElementById("popupCerrar").addEventListener("click", () => {
+      popup.style.display = "none";
+    });
+
     document.getElementById("btnAplicar").addEventListener("click", async () => {
       const codigo = document.getElementById("codigoInput").value.trim().toUpperCase();
       if (codigo.length !== 5) {
