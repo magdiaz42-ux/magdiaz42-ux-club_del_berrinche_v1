@@ -1,3 +1,18 @@
+<?php
+// Si el usuario ya está logueado, redirigirlo a su panel
+session_start();
+if (isset($_SESSION['rol'])) {
+  switch ($_SESSION['rol']) {
+    case 'admin': header("Location: panel_admin/panel_admin.php"); exit;
+    case 'dj': header("Location: panel_dj/panel_dj.php"); exit;
+    case 'cajero': header("Location: panel_cajero/panel_cajero.php"); exit;
+    case 'karaoke': header("Location: panel_karaoke/panel_karaoke.php"); exit;
+    case 'cine': header("Location: panel_cine/panel_cine.php"); exit;
+    case 'juegos': header("Location: panel_juegos/panel_juegos.php"); exit;
+    default: header("Location: panel_cliente/panel_cliente.php"); exit;
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -132,53 +147,28 @@
     <h1>El Club del Berrinche</h1>
     <p>Ingresá tu correo o teléfono para acceder</p>
 
-    <form id="loginForm">
-      <input id="usuario" name="usuario" class="input" placeholder="Correo o teléfono" required />
-      <input id="password" name="password" type="password" class="input" placeholder="Contraseña" required />
+    <form action="php/login_procesar.php" method="POST">
+      <input name="usuario" class="input" placeholder="Correo o teléfono" required />
+      <input name="password" type="password" class="input" placeholder="Contraseña" required />
       <button type="submit" class="btn">Entrar</button>
     </form>
 
-    <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+    <p><a href="recuperar_password.php">¿Olvidaste tu contraseña?</a></p>
     <p><a href="registro/registro_etapa1_datos.html">¿Todavía no tenés cuenta? Registrate acá</a></p>
+
+    <?php if (isset($_GET['error'])): ?>
+      <p style="color:#ff6b6b; margin-top:10px;">
+        <?php
+          switch ($_GET['error']) {
+            case 'campos_vacios': echo '⚠️ Completá todos los campos.'; break;
+            case 'pass_incorrecta': echo '❌ Contraseña incorrecta.'; break;
+            case 'usuario_inactivo': echo '🚫 Usuario inactivo. Consultá en el local.'; break;
+            case 'acceso_denegado': echo '🔒 Acceso no autorizado.'; break;
+            default: echo '❌ Error al iniciar sesión.';
+          }
+        ?>
+      </p>
+    <?php endif; ?>
   </div>
-
-  <script>
-    const form = document.getElementById("loginForm");
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      const usuario = document.getElementById("usuario").value.trim().toLowerCase();
-      const password = document.getElementById("password").value.trim();
-
-      if (!usuario || !password) {
-        alert("⚠️ Ingresá tus datos correctamente.");
-        return;
-      }
-
-      let rol = "cliente";
-      if (usuario.includes("admin")) rol = "admin";
-      else if (usuario.includes("dj")) rol = "dj";
-      else if (usuario.includes("cajero")) rol = "cajero";
-      else if (usuario.includes("karaoke")) rol = "karaoke";
-      else if (usuario.includes("cine")) rol = "cine";
-      else if (usuario.includes("juego") || usuario.includes("arcade")) rol = "juegos";
-
-      localStorage.setItem("usuario", usuario);
-      localStorage.setItem("rol", rol);
-      localStorage.setItem("isLogged", "true");
-
-      switch (rol) {
-        case "admin": window.location.href = "panel_admin/panel_admin.html"; break;
-        case "dj": window.location.href = "panel_dj/panel_dj.html"; break;
-        case "cajero": window.location.href = "panel_cajero/panel_cajero.html"; break;
-        case "karaoke": window.location.href = "panel_karaoke/panel_karaoke.html"; break;
-        case "cine": window.location.href = "panel_cine/panel_cine.html"; break;
-        case "juegos": window.location.href = "panel_juegos/panel_juegos.html"; break;
-        default: window.location.href = "panel_cliente/panel_cliente.php";
-      }
-    });
-  </script>
 </body>
 </html>
-e

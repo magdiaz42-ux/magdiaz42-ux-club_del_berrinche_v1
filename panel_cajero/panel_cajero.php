@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['id_usuario'])) {
-  header("Location: ../login.php");
+if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'cajero') {
+  header("Location: ../login.php?error=acceso_denegado");
   exit;
 }
 ?>
@@ -10,11 +10,11 @@ if (!isset($_SESSION['id_usuario'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Cliente | El Club del Berrinche</title>
+  <title>Panel del Cajero | El Club del Berrinche</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../panel_cliente/componentes/menu_cliente.css">
+  <link rel="stylesheet" href="componentes/menu_cajero.css">
 
   <style>
     body {
@@ -43,25 +43,21 @@ if (!isset($_SESSION['id_usuario'])) {
       display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
       flex-direction: column;
-      transition: filter 0.3s ease;
-    }
-
-    .sidebar.active ~ .contenido {
-      filter: blur(2px) brightness(0.7);
+      text-align: center;
     }
 
     h1 {
       color: #00fff2;
       text-shadow: 0 0 25px #00fff2, 0 0 50px #4b00ff;
-      font-size: 2.2rem;
+      font-size: 2.4rem;
+      margin: 0;
     }
 
-    .mensaje-bienvenida {
+    p {
       color: #ccc;
       font-size: 1rem;
-      max-width: 500px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -69,15 +65,15 @@ if (!isset($_SESSION['id_usuario'])) {
 <body>
   <div class="overlay"></div>
 
-  <!-- ✅ Menú lateral -->
-  <?php include '../panel_cliente/componentes/menu_cliente.php'; ?>
+  <!-- Menú lateral -->
+  <?php include 'componentes/menu_cajero.php'; ?>
 
   <!-- Contenido principal -->
-  <div class="contenido" id="contenido">
-    <h1>Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?> 👋</h1>
-    <p class="mensaje-bienvenida">Elegí una sección desde el menú para comenzar tu experiencia en el Club del Berrinche.</p>
+  <div class="contenido">
+    <h1>El Club del Berrinche</h1>
+    <p>Panel del Cajero</p>
   </div>
 
-  <script src="../panel_cliente/componentes/menu_cliente.js" defer></script>
+  <script src="componentes/menu_cajero.js" defer></script>
 </body>
 </html>

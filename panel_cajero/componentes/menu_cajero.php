@@ -1,34 +1,24 @@
-<!-- === MENU CLIENTE (COMPONENTE GLOBAL) === -->
+<!-- === MENU CAJERO (COMPONENTE GLOBAL) === -->
 <div class="menu-btn" id="menuBtn">
   <div></div><div></div><div></div>
 </div>
 
 <div class="sidebar" id="sidebar">
-  <!-- Avatar y nombre dinámicos -->
+  <!-- Avatar y nombre del cajero -->
   <img id="userAvatar" class="avatar" src="../assets/img/avatars/avatar1.png" alt="Avatar">
   <div id="nombreUsuario" class="nombre-usuario">Cargando...</div>
 
   <div class="menu-links">
-    <button data-section="inicio">🏠 Inicio</button>
-    <button data-section="perfil">👤 Perfil</button>
-    <button data-section="cupones">🎟️ Tus Cupones</button>
-    <button data-section="menu">🍸 Menú</button>
-    <button data-section="dj">🎧 DJ</button>
-    <button data-section="karaoke">🎤 Karaoke</button>
-    <button data-section="cine">🎬 Silent Cine</button>
-    <button data-section="juegos">🎮 Juegos</button>
-    <button data-section="vr">🕶️ VR</button>
+    <button data-section="generar">🎟️ Generar Ticket</button>
+    <button data-section="ver">📋 Ver Códigos</button>
   </div>
 
-  <!-- 🚪 Botón real de logout (funcional) -->
-  <form action="../php/logout.php" method="POST" style="width:100%;margin-top:15px;">
-    <button type="submit" class="logout-btn">🚪 Cerrar sesión</button>
-  </form>
+  <button class="logout-btn" id="logoutBtn">🚪 Cerrar sesión</button>
 </div>
 
 <script>
   // === CARGAR DATOS DEL USUARIO ===
-  fetch("../php/panel_cliente_datos.php")
+  fetch("../php/panel_cajero_datos.php")
     .then(res => res.json())
     .then(data => {
       if (data.success) {

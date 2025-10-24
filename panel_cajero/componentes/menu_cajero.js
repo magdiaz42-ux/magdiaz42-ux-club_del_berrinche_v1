@@ -1,4 +1,4 @@
-// === MENU CLIENTE (LÓGICA GLOBAL) ===
+// === MENU CAJERO (LÓGICA GLOBAL) ===
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
 
@@ -12,10 +12,14 @@ document.querySelectorAll(".menu-links button").forEach(btn => {
   btn.addEventListener("click", () => {
     const section = btn.getAttribute("data-section");
     switch (section) {
-      case "inicio": window.location.href = "panel_cliente.php"; break;
-      case "perfil": window.location.href = "perfil.php"; break;
-      case "cupones": window.location.href = "cupones.php"; break;
-      default: alert(`La sección "${section}" está en desarrollo 🧩`);
+      case "generar":
+        window.location.href = "generar_ticket.php";
+        break;
+      case "ver":
+        window.location.href = "ver_codigos.php";
+        break;
+      default:
+        alert(`Sección "${section}" en desarrollo 🧩`);
     }
     sidebar.classList.remove("active");
     menuBtn.classList.remove("active");
@@ -25,12 +29,9 @@ document.querySelectorAll(".menu-links button").forEach(btn => {
 // === Cerrar sesión ===
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // Evita redirecciones automáticas del botón
+  logoutBtn.addEventListener("click", () => {
     if (confirm("¿Seguro que querés cerrar sesión?")) {
-      fetch("../php/logout.php", { method: "POST" })
-        .then(() => (window.location.href = "../login.php?logout=1"))
-        .catch((err) => console.error("Error al cerrar sesión:", err));
+      fetch("../php/logout.php").then(() => (window.location.href = "../login.php"));
     }
   });
 }
