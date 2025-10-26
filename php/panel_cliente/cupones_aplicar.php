@@ -1,11 +1,22 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../conexion_auto.php';
-header('Content-Type: application/json');
+require_once __DIR__ . '/../conexion_auto.php';
+header('Content-Type: application/json; charset=utf-8');
+
+// Mostrar errores (solo para debug)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+$response = [
+  "success" => false,
+  "message" => "Error desconocido",
+  "debug" => []
+];
 
 // --- Validar sesión ---
 if (!isset($_SESSION['id_usuario'])) {
-  echo json_encode(["success" => false, "message" => "Sesión no activa."]);
+  $response["message"] = "Sesión no activa.";
+  echo json_encode($response);
   exit;
 }
 
@@ -13,65 +24,105 @@ $id_usuario = $_SESSION['id_usuario'];
 $input = json_decode(file_get_contents("php://input"), true);
 $codigo = strtoupper(trim($input['codigo'] ?? ''));
 
-// --- Validar formato ---
 if (strlen($codigo) !== 5) {
-  echo json_encode(["success" => false, "message" => "Código inválido (debe tener 5 caracteres)."]);
+  $response["message"] = "Código inválido (debe tener 5 caracteres).";
+  echo json_encode($response);
   exit;
 }
 
-/* 🔹 Verificar si el código existe y está activo */
-$sql = "SELECT id FROM usuarios WHERE codigo_5 = ? AND activo = 1 LIMIT 1";
+// --- Buscar el código ---
+$sql = "SELECT id, disponible, id_usuario FROM codigos_unicos WHERE codigo = ? LIMIT 1";
 $stmt = $conn->prepare($sql);
+
+if (!$stmt) {
+  $response["message"] = "Error preparando SELECT de código";
+  $response["debug"][] = $conn->error;
+  echo json_encode($response);
+  exit;
+}
+
 $stmt->bind_param("s", $codigo);
 $stmt->execute();
 $res = $stmt->get_result();
 
 if ($res->num_rows === 0) {
-  echo json_encode(["success" => false, "message" => "Código no válido o inactivo."]);
+  $response["message"] = "El código no existe.";
+  echo json_encode($response);
   exit;
 }
 
 $codigo_data = $res->fetch_assoc();
 $id_codigo = $codigo_data['id'];
+$disponible = (int)$codigo_data['disponible'];
+$id_usuario_asignado = $codigo_data['id_usuario'];
 
-/* 🔹 Verificar si el código ya fue aplicado por CUALQUIER usuario */
-$sqlCheck = "SELECT COUNT(*) AS total FROM cupones_asignados WHERE id_codigo = ?";
-$stmt = $conn->prepare($sqlCheck);
-$stmt->bind_param("i", $id_codigo);
-$stmt->execute();
-$resCheck = $stmt->get_result()->fetch_assoc();
-
-if ($resCheck['total'] > 0) {
-  echo json_encode(["success" => false, "message" => "Este código ya fue usado por otro cliente."]);
+if ($disponible === 0 && $id_usuario_asignado !== $id_usuario) {
+  $response["message"] = "Este código ya fue usado por otro cliente.";
+  echo json_encode($response);
+  exit;
+}
+if ($disponible === 0 && $id_usuario_asignado === $id_usuario) {
+  $response["message"] = "Ya aplicaste este código antes.";
+  echo json_encode($response);
   exit;
 }
 
-/* 🔹 Traer 9 cupones aleatorios activos */
-$cupones_base = $conn->query("SELECT id FROM cupones_base WHERE activo = 1 ORDER BY RAND() LIMIT 9");
+// --- Buscar cupones ---
 $cupones = [];
-while ($c = $cupones_base->fetch_assoc()) $cupones[] = $c['id'];
+$random = $conn->query("SELECT id FROM cupones_base WHERE activo = 1 AND tipo = 'random' ORDER BY RAND() LIMIT 9");
+if (!$random) {
+  $response["message"] = "Error obteniendo cupones random.";
+  $response["debug"][] = $conn->error;
+  echo json_encode($response);
+  exit;
+}
+while ($c = $random->fetch_assoc()) $cupones[] = $c['id'];
 
-/* 🔹 Agregar el cupón fijo (tipo = 'fijo') */
-$cupon_fijo = $conn->query("SELECT id FROM cupones_base WHERE tipo = 'fijo' AND activo = 1 LIMIT 1");
-if ($cupon_fijo && $cupon_fijo->num_rows > 0) {
-  $fijo = $cupon_fijo->fetch_assoc();
-  array_unshift($cupones, $fijo['id']);
+$fijo = $conn->query("SELECT id FROM cupones_base WHERE tipo = 'fijo' AND activo = 1 LIMIT 1");
+if ($fijo && $fijo->num_rows > 0) {
+  $f = $fijo->fetch_assoc();
+  array_unshift($cupones, $f['id']);
 }
 
-/* 🔹 Insertar los 10 cupones */
+// --- Insertar ---
 $insertados = 0;
 foreach ($cupones as $id_cupon_base) {
   $codigo_unico = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, 10);
-  $sqlInsert = "INSERT INTO cupones_asignados 
+  $sqlInsert = "INSERT INTO cupones_asignados
                 (id_usuario, id_codigo, id_cupon_base, codigo_unico, fecha_asignacion, fecha_vencimiento, canjeado)
                 VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), 0)";
   $stmt = $conn->prepare($sqlInsert);
+  if (!$stmt) {
+    $response["debug"][] = "Error preparando INSERT: " . $conn->error;
+    continue;
+  }
   $stmt->bind_param("iiis", $id_usuario, $id_codigo, $id_cupon_base, $codigo_unico);
-  if ($stmt->execute()) $insertados++;
+  if ($stmt->execute()) {
+    $insertados++;
+  } else {
+    $response["debug"][] = "Error ejecutando INSERT: " . $stmt->error;
+  }
 }
 
-echo json_encode([
-  "success" => true,
-  "message" => "🎉 ¡Se asignaron $insertados cupones nuevos a tu cuenta!"
-]);
+// --- Actualizar código ---
+$sqlUpdate = "UPDATE codigos_unicos 
+              SET disponible = 0, fecha_asignacion = NOW(), id_usuario = ? 
+              WHERE id = ?";
+$stmt = $conn->prepare($sqlUpdate);
+if (!$stmt) {
+  $response["debug"][] = "Error preparando UPDATE: " . $conn->error;
+} else {
+  $stmt->bind_param("ii", $id_usuario, $id_codigo);
+  $stmt->execute();
+}
+
+// --- Respuesta final ---
+$response["success"] = $insertados > 0;
+$response["message"] = $insertados > 0 
+  ? "🎉 ¡Se asignaron $insertados cupones nuevos (válidos por 24hs)!"
+  : "❌ No se asignaron cupones.";
+$response["debug"][] = "Insertados: $insertados";
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+$conn->close();
 ?>

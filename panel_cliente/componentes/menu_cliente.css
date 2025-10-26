@@ -1,4 +1,4 @@
-/* === MENU CLIENTE (ESTILOS GLOBALES) === */
+/* === MENU CLIENTE (ESTILOS GLOBALES CON EFECTOS NEÓN) === */
 
 .menu-btn {
   position: fixed;
@@ -19,13 +19,11 @@
   box-shadow: 0 0 20px rgba(0,255,242,0.25);
   transition: all 0.4s ease;
 }
-
 .menu-btn:hover {
   background: rgba(20, 20, 40, 1);
   box-shadow: 0 0 25px rgba(0,255,242,0.5);
   transform: scale(1.05);
 }
-
 .menu-btn div {
   width: 24px;
   height: 3px;
@@ -34,7 +32,6 @@
   margin: 3px 0;
   transition: all 0.3s ease;
 }
-
 /* Animación del ícono (X al abrir) */
 .menu-btn.active div:nth-child(1) {
   transform: rotate(45deg) translate(6px, 5px);
@@ -50,25 +47,35 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left: -280px; /* completamente oculto al inicio */
+  left: -280px;
   width: 260px;
   height: 100%;
   background: rgba(10, 10, 20, 0.95);
   box-shadow: 0 0 50px rgba(0,255,242,0.25);
-  transition: left 0.4s ease;
+  border-right: 1px solid rgba(0,255,242,0.25);
   z-index: 150;
-  padding: 25px 20px 70px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-right: 1px solid rgba(0,255,242,0.25);
+  justify-content: flex-start;
+  padding: 25px 20px 70px;
   box-sizing: border-box;
+  transition: left 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
 }
-
 .sidebar.active {
-  left: 0; /* visible solo al abrir */
+  left: 0;
+  opacity: 1;
+  animation: slideIn 0.5s ease forwards;
 }
 
+/* === ANIMACIÓN ENTRADA DEL SIDEBAR === */
+@keyframes slideIn {
+  from { transform: translateX(-50px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* === AVATAR CON GLOW NEÓN === */
 .avatar {
   width: 110px;
   height: 110px;
@@ -77,23 +84,40 @@
   object-fit: cover;
   box-shadow: 0 0 20px rgba(0,255,242,0.4);
   margin-bottom: 10px;
+  animation: pulseGlow 2.5s infinite alternate;
+  transition: transform 0.3s ease;
+}
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(0,255,242,0.6), 0 0 50px rgba(0,255,242,0.4);
+}
+@keyframes pulseGlow {
+  from { box-shadow: 0 0 10px rgba(0,255,242,0.3), 0 0 25px rgba(0,255,242,0.2); }
+  to   { box-shadow: 0 0 25px rgba(0,255,242,0.6), 0 0 50px rgba(0,255,242,0.4); }
 }
 
+/* === NOMBRE DEL USUARIO CON EFECTO DE BRILLO === */
 .nombre-usuario {
   color: #00fff2;
   font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 20px;
+  font-weight: 700;
+  margin-bottom: 25px;
   text-align: center;
+  text-shadow: 0 0 10px #00fff2, 0 0 25px #4b00ff;
+  animation: fadeInName 1s ease forwards;
+}
+@keyframes fadeInName {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* === BOTONES DE NAVEGACIÓN === */
 .menu-links {
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
 }
-
 .menu-links button {
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(0,255,242,0.3);
@@ -105,29 +129,41 @@
   text-align: center;
   transition: all 0.25s ease;
 }
-
 .menu-links button:hover {
   background: linear-gradient(90deg, #0037ff, #00fff2);
   box-shadow: 0 0 20px rgba(0,255,242,0.4);
   transform: scale(1.05);
 }
 
+/* === BOTÓN DE CERRAR SESIÓN === */
 .logout-btn {
-  width: 100%;
-  background: rgba(255,0,0,0.1);
-  border: 1px solid rgba(255,60,60,0.4);
+  position: absolute;
+  bottom: 25px;
+  left: 20px;
+  width: calc(100% - 40px);
+  background: linear-gradient(90deg, #ff0040, #a0002f);
+  border: 1px solid rgba(255,80,80,0.5);
   border-radius: 25px;
-  color: #ff8080;
-  font-weight: 600;
-  padding: 12px;
+  color: #fff;
+  font-weight: 700;
+  padding: 14px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 20px rgba(255,0,80,0.4);
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: auto;
+  text-align: center;
+}
+.logout-btn:hover {
+  background: linear-gradient(90deg, #ff3366, #ff0040);
+  box-shadow: 0 0 30px rgba(255,0,80,0.6);
+  transform: scale(1.03);
 }
 
-.logout-btn:hover {
-  background: linear-gradient(90deg, #ff0040, #ff8080);
-  color: #fff;
-  box-shadow: 0 0 20px rgba(255,80,80,0.5);
-  transform: scale(1.05);
+/* === RESPONSIVE === */
+@media (max-height: 600px) {
+  .logout-btn {
+    position: relative;
+    bottom: 0;
+    margin-top: 20px;
+  }
 }

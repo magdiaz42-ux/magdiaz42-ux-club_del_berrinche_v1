@@ -1,9 +1,32 @@
 <?php
 session_start();
+require_once("../php/conexion_auto.php");
+
+// 🚫 Verificación de acceso
 if (!isset($_SESSION['id_usuario'])) {
   header("Location: ../login.php");
   exit;
 }
+
+$id_usuario = $_SESSION['id_usuario'];
+$nombre_apodo = "";
+
+// ✅ Obtener el nombre/apodo del cliente desde la BD
+$sql = "SELECT nombre_apodo FROM usuarios WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+if ($resultado && $resultado->num_rows > 0) {
+  $user = $resultado->fetch_assoc();
+  $nombre_apodo = htmlspecialchars($user['nombre_apodo']);
+} else {
+  $nombre_apodo = "Cliente";
+}
+
+$stmt->close();
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -55,7 +78,8 @@ if (!isset($_SESSION['id_usuario'])) {
     h1 {
       color: #00fff2;
       text-shadow: 0 0 25px #00fff2, 0 0 50px #4b00ff;
-      font-size: 2.2rem;
+      font-size: 2.4rem;
+      margin-bottom: 10px;
     }
 
     .mensaje-bienvenida {
@@ -74,8 +98,10 @@ if (!isset($_SESSION['id_usuario'])) {
 
   <!-- Contenido principal -->
   <div class="contenido" id="contenido">
-    <h1>Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?> 👋</h1>
-    <p class="mensaje-bienvenida">Elegí una sección desde el menú para comenzar tu experiencia en el Club del Berrinche.</p>
+    <h1>¡Bienvenido, <?php echo $nombre_apodo; ?>! 👋</h1>
+    <p class="mensaje-bienvenida">
+      Elegí una sección desde el menú para comenzar tu experiencia en <strong>El Club del Berrinche</strong>.
+    </p>
   </div>
 
   <script src="../panel_cliente/componentes/menu_cliente.js" defer></script>

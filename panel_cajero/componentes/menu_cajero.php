@@ -1,33 +1,62 @@
-<!-- === MENU CAJERO (COMPONENTE GLOBAL) === -->
-<div class="menu-btn" id="menuBtn">
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+
+// ✅ Ruta universal
+$conexionPath = dirname(__DIR__, 2) . '/php/conexion_auto.php';
+if (file_exists($conexionPath)) {
+  require_once $conexionPath;
+}
+
+// ==============================
+// Datos del cajero
+// ==============================
+$id_usuario = $_SESSION['id_usuario'] ?? null;
+$nombre_usuario = "Cajero";
+$avatar_usuario = "../assets/img/avatars/avatar_default.png";
+
+if ($id_usuario && isset($conn)) {
+  $stmt = $conn->prepare("SELECT nombre_apodo, selfie_avatar FROM usuarios WHERE id = ?");
+  $stmt->bind_param("i", $id_usuario);
+  $stmt->execute();
+  $res = $stmt->get_result();
+  if ($res && $res->num_rows > 0) {
+    $user = $res->fetch_assoc();
+    $nombre_usuario = $user['nombre_apodo'] ?: "Cajero";
+    if (!empty($user['selfie_avatar'])) {
+      $avatar_usuario = "../" . ltrim($user['selfie_avatar'], '/');
+    }
+  }
+  $stmt->close();
+}
+?>
+
+<!-- === BOTÓN HAMBURGUESA === -->
+<div id="menuBtn" class="menu-btn">
   <div></div><div></div><div></div>
 </div>
 
-<div class="sidebar" id="sidebar">
-  <!-- Avatar y nombre del cajero -->
-  <img id="userAvatar" class="avatar" src="../assets/img/avatars/avatar1.png" alt="Avatar">
-  <div id="nombreUsuario" class="nombre-usuario">Cargando...</div>
+<!-- === PANEL LATERAL === -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-content">
+    <img src="<?php echo $avatar_usuario; ?>" class="avatar" alt="Avatar">
+    <div class="nombre-usuario"><?php echo htmlspecialchars($nombre_usuario); ?></div>
 
-  <div class="menu-links">
-    <button data-section="generar">🎟️ Generar Ticket</button>
-    <button data-section="ver">📋 Ver Códigos</button>
+    <div class="menu-links">
+      <button onclick="window.location.href='generar_ticket.php'">🎟️ Generar Ticket</button>
+      <button onclick="window.location.href='ver_codigos.php'">📋 Ver Tickets</button>
+    </div>
+
+    <button class="logout-btn" onclick="window.location.href='../php/logout.php'">🚪 Cerrar sesión</button>
   </div>
-
-  <button class="logout-btn" id="logoutBtn">🚪 Cerrar sesión</button>
 </div>
 
+<!-- ✅ Carga forzada del JS -->
 <script>
-  // === CARGAR DATOS DEL USUARIO ===
-  fetch("../php/panel_cajero_datos.php")
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        const user = data.data;
-        document.getElementById("nombreUsuario").textContent = user.nombre_apodo || "Sin nombre";
-        document.getElementById("userAvatar").src = user.avatar || "../assets/img/avatars/avatar1.png";
-      } else {
-        document.getElementById("nombreUsuario").textContent = "Sin sesión";
-      }
-    })
-    .catch(err => console.error("Error al cargar perfil:", err));
+console.log("📦 Cargando menú cajero...");
+const s = document.createElement("script");
+s.src = "../panel_cajero/componentes/menu_cajero.js";
+s.defer = true;
+document.body.appendChild(s);
 </script>

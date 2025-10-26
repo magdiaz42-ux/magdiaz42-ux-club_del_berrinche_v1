@@ -1,5 +1,14 @@
 <?php
+// ============================
+// PANEL CAJERO - GENERAR TICKET
+// ============================
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
+
+// 🚫 Verificación de acceso
 if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'cajero') {
   header("Location: ../login.php?error=acceso_denegado");
   exit;
@@ -10,8 +19,9 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'cajero') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generar Ticket | El Club del Berrinche</title>
+  <title>Generar Ticket | Panel Cajero</title>
 
+  <!-- Fuentes y estilos -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="componentes/menu_cajero.css">
@@ -23,29 +33,46 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'cajero') {
       background: url("../assets/img/fondo-hexagonos.jpg") no-repeat center center fixed;
       background-size: cover;
       color: #fff;
-      min-height: 100vh;
-      overflow-x: hidden;
+      height: 100vh;
+      overflow: hidden;
     }
 
+    /* 🔧 Overlay al fondo (no tapa el menú) */
     .overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(3px);
       z-index: 0;
     }
 
-    .contenido {
+    .contenedor-principal {
       position: relative;
       z-index: 1;
-      padding-top: 100px;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
+      padding: 20px;
     }
 
-    h1 {
+    .panel-box {
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(0,255,242,0.3);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(0,255,242,0.3);
+      max-width: 480px;
+      width: 90%;
+    }
+
+    h2 {
       color: #00fff2;
       text-shadow: 0 0 25px #00fff2, 0 0 50px #4b00ff;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
     }
 
     .btn {
@@ -53,74 +80,124 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'cajero') {
       border: none;
       color: #fff;
       font-weight: 600;
-      padding: 14px 25px;
+      padding: 14px 28px;
       border-radius: 25px;
-      box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
       font-size: 1rem;
-      text-transform: uppercase;
+      margin: 10px 5px;
+      box-shadow: 0 0 20px rgba(0,255,242,0.4);
+      transition: all 0.3s ease;
     }
 
     .btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 40px rgba(0, 255, 242, 0.8);
+      box-shadow: 0 0 30px rgba(0,255,242,0.6);
     }
 
-    #resultado {
-      margin-top: 40px;
+    .resultado {
+      display: none;
+      margin-top: 25px;
+      animation: fadeIn 0.5s ease;
     }
 
-    #resultado img {
-      margin-top: 15px;
-      width: 200px;
-      border: 2px solid rgba(0,255,242,0.3);
+    .qr-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .qr-box img {
+      width: 180px;
+      height: 180px;
+      border: 2px solid #00fff2;
       border-radius: 10px;
       box-shadow: 0 0 25px rgba(0,255,242,0.4);
     }
+
+    .codigo {
+      font-size: 1.5rem;
+      color: #00fff2;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ✅ RESPONSIVE */
+    @media (max-width: 600px) {
+      .panel-box { padding: 20px; width: 95%; }
+      h2 { font-size: 1.5rem; }
+      .btn { font-size: 0.9rem; padding: 12px 20px; }
+      .qr-box img { width: 150px; height: 150px; }
+      .codigo { font-size: 1.2rem; }
+    }
   </style>
 </head>
+
 <body>
   <div class="overlay"></div>
+
+  <!-- ✅ Menú lateral -->
   <?php include 'componentes/menu_cajero.php'; ?>
 
-  <div class="contenido">
-    <h1>🎟️ Generar nuevo ticket</h1>
-    <button class="btn" id="btnGenerar">Generar Ticket</button>
+  <!-- ✅ Contenedor principal -->
+  <div class="contenedor-principal">
+    <div class="panel-box">
+      <h2>🎟️ Generar Ticket Único</h2>
 
-    <div id="resultado"></div>
+      <button id="btnGenerar" class="btn">Generar Ticket</button>
+      <button id="btnImprimir" class="btn" style="display:none;" onclick="window.print()">🖨️ Imprimir</button>
+
+      <div class="resultado" id="resultado">
+        <div class="qr-box">
+          <img id="qrImg" src="" alt="QR del ticket">
+          <div class="codigo" id="codigoTexto"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script src="componentes/menu_cajero.js" defer></script>
-
+  <!-- ✅ Script generar ticket -->
   <script>
-    document.getElementById("btnGenerar").addEventListener("click", () => {
-      const btn = document.getElementById("btnGenerar");
-      btn.disabled = true;
-      btn.textContent = "Generando...";
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnGenerar = document.getElementById("btnGenerar");
+      const btnImprimir = document.getElementById("btnImprimir");
+      const resultado = document.getElementById("resultado");
+      const qrImg = document.getElementById("qrImg");
+      const codigoTexto = document.getElementById("codigoTexto");
 
-      fetch("generar_ticket_accion.php")
-        .then(res => res.json())
-        .then(data => {
+      btnGenerar.addEventListener("click", async () => {
+        btnGenerar.disabled = true;
+        btnGenerar.innerText = "Generando...";
+
+        try {
+          const res = await fetch("../php/generar_ticket_accion.php");
+          const data = await res.json();
+
           if (data.success) {
-            document.getElementById("resultado").innerHTML = `
-              <h2>Código: ${data.codigo}</h2>
-              <img src="${data.qr}" alt="QR del ticket">
-              <br><br>
-              <button class="btn" onclick="window.print()">🖨️ Imprimir Ticket</button>
-            `;
+            resultado.style.display = "block";
+            qrImg.src = data.qr;
+            codigoTexto.textContent = "Código: " + data.codigo;
+            btnImprimir.style.display = "inline-block";
           } else {
-            document.getElementById("resultado").innerHTML = `<p style="color:#ff6b6b;">❌ ${data.message}</p>`;
+            alert("❌ Error: " + data.message);
           }
-        })
-        .catch(() => {
-          document.getElementById("resultado").innerHTML = `<p style="color:#ff6b6b;">⚠️ Error al generar el ticket.</p>`;
-        })
-        .finally(() => {
-          btn.disabled = false;
-          btn.textContent = "Generar Ticket";
-        });
+        } catch (err) {
+          alert("⚠️ Error de conexión con el servidor.");
+        } finally {
+          btnGenerar.disabled = false;
+          btnGenerar.innerText = "Generar Ticket";
+        }
+      });
     });
   </script>
+
+  <!-- ✅ Script del menú (ruta absoluta garantizada) -->
+  <script src="/club_del_berrinche_v1/panel_cajero/componentes/menu_cajero.js"></script>
 </body>
 </html>

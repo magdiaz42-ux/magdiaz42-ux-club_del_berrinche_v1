@@ -1,36 +1,34 @@
 // === MENU CLIENTE (LÓGICA GLOBAL) ===
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
+document.addEventListener("DOMContentLoaded", () => {
+  const menuBtn = document.getElementById("menuBtn");
+  const sidebar = document.getElementById("sidebar");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-menuBtn.addEventListener("click", () => {
-  menuBtn.classList.toggle("active");
-  sidebar.classList.toggle("active");
+  // --- Abrir/cerrar menú ---
+  if (menuBtn && sidebar) {
+    menuBtn.addEventListener("click", () => {
+      menuBtn.classList.toggle("active");
+      sidebar.classList.toggle("active");
+    });
+
+    // Cerrar al hacer clic fuera del menú
+    document.addEventListener("click", (e) => {
+      if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+        sidebar.classList.remove("active");
+        menuBtn.classList.remove("active");
+      }
+    });
+  }
+
+  // --- Cerrar sesión ---
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (confirm("¿Seguro que querés cerrar sesión?")) {
+        fetch("../php/logout.php", { method: "POST" })
+          .then(() => (window.location.href = "../login.php?logout=1"))
+          .catch((err) => console.error("Error al cerrar sesión:", err));
+      }
+    });
+  }
 });
-
-// === Navegación ===
-document.querySelectorAll(".menu-links button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const section = btn.getAttribute("data-section");
-    switch (section) {
-      case "inicio": window.location.href = "panel_cliente.php"; break;
-      case "perfil": window.location.href = "perfil.php"; break;
-      case "cupones": window.location.href = "cupones.php"; break;
-      default: alert(`La sección "${section}" está en desarrollo 🧩`);
-    }
-    sidebar.classList.remove("active");
-    menuBtn.classList.remove("active");
-  });
-});
-
-// === Cerrar sesión ===
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // Evita redirecciones automáticas del botón
-    if (confirm("¿Seguro que querés cerrar sesión?")) {
-      fetch("../php/logout.php", { method: "POST" })
-        .then(() => (window.location.href = "../login.php?logout=1"))
-        .catch((err) => console.error("Error al cerrar sesión:", err));
-    }
-  });
-}

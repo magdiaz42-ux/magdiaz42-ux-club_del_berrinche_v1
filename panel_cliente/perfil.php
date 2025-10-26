@@ -1,9 +1,36 @@
 <?php
 session_start();
+require_once("../php/conexion_auto.php");
+
 if (!isset($_SESSION['id_usuario'])) {
   header("Location: ../login.html");
   exit;
 }
+
+$id_usuario = $_SESSION['id_usuario'];
+$nombre_apodo = "Cliente";
+$telefono = "";
+$email = "";
+$avatar = "../assets/img/avatars/avatar_default.png";
+
+// 🔹 Traer datos desde la base
+$query = "SELECT nombre_apodo, telefono, email, selfie_avatar FROM usuarios WHERE id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+if ($resultado && $resultado->num_rows > 0) {
+  $user = $resultado->fetch_assoc();
+  $nombre_apodo = htmlspecialchars($user['nombre_apodo'] ?? "Cliente");
+  $telefono = htmlspecialchars($user['telefono'] ?? "");
+  $email = htmlspecialchars($user['email'] ?? "");
+  if (!empty($user['selfie_avatar'])) {
+    $avatar = "../" . ltrim($user['selfie_avatar'], '/');
+  }
+}
+$stmt->close();
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -12,7 +39,6 @@ if (!isset($_SESSION['id_usuario'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Perfil | El Club del Berrinche</title>
 
-  <!-- Fuentes y estilos -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="stylesheet" href="componentes/menu_cliente.css" />
@@ -74,6 +100,12 @@ if (!isset($_SESSION['id_usuario'])) {
       box-shadow: 0 0 20px rgba(0,255,242,0.4);
       object-fit: cover;
       margin-bottom: 10px;
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 10px rgba(0,255,242,0.3), 0 0 25px rgba(0,255,242,0.2); }
+      to   { box-shadow: 0 0 25px rgba(0,255,242,0.6), 0 0 50px rgba(0,255,242,0.4); }
     }
 
     .btn-avatar {
@@ -90,6 +122,14 @@ if (!isset($_SESSION['id_usuario'])) {
     .btn-avatar:hover {
       transform: scale(1.05);
       box-shadow: 0 0 25px rgba(0,255,242,0.6);
+    }
+
+    .nombre-usuario {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #00fff2;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00fff2, 0 0 25px #4b00ff;
     }
 
     label {
@@ -117,26 +157,38 @@ if (!isset($_SESSION['id_usuario'])) {
     .botones {
       display: flex;
       justify-content: center;
-      gap: 20px;
+      align-items: center;
+      gap: 15px;
       margin-top: 25px;
     }
 
-    button {
+    .botones button {
       background: linear-gradient(90deg, #0037ff, #00fff2);
       border: none;
       color: #fff;
       font-weight: 600;
       border-radius: 25px;
-      padding: 10px 25px;
+      padding: 12px 28px;
       cursor: pointer;
-      transition: 0.3s;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 20px rgba(0,255,242,0.4);
+      transition: all 0.3s ease;
     }
 
-    button:hover {
+    .botones button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(0,255,242,0.6);
+      box-shadow: 0 0 30px rgba(0,255,242,0.6);
     }
 
+    .botones button:disabled {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* --- MODAL --- */
     .modal {
       position: fixed;
       inset: 0;
@@ -146,7 +198,6 @@ if (!isset($_SESSION['id_usuario'])) {
       align-items: center;
       z-index: 300;
     }
-
     .modal.active { display: flex; }
 
     .modal-content {
@@ -160,8 +211,23 @@ if (!isset($_SESSION['id_usuario'])) {
       box-shadow: 0 0 40px rgba(0,255,242,0.3);
     }
 
-    .modal-content h2 { color: #00fff2; margin-bottom: 15px; }
-    .modal-content button { width: 100%; margin: 8px 0; }
+    .modal-content button {
+      width: 100%;
+      margin: 8px 0;
+      border-radius: 25px;
+      background: linear-gradient(90deg,#0037ff,#00fff2);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .modal-content button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0,255,242,0.4);
+    }
 
     .avatar-gallery {
       display: flex;
@@ -201,31 +267,33 @@ if (!isset($_SESSION['id_usuario'])) {
 
   <div class="perfil-container">
     <h1>Tu Perfil</h1>
+
     <div class="avatar-area">
-      <img id="userAvatar" src="../assets/img/avatars/avatar1.png" alt="Avatar">
+      <img id="userAvatar" src="<?= $avatar ?>" alt="Avatar">
       <button type="button" class="btn-avatar" id="btnCambiarAvatar">📸 Cambiar Avatar / Selfie</button>
+      <div class="nombre-usuario"><?= $nombre_apodo ?></div>
     </div>
 
     <form id="perfilForm">
-      <input type="hidden" id="selfie_avatar" name="selfie_avatar">
+      <input type="hidden" id="selfie_avatar" name="selfie_avatar" value="">
 
       <label>Nombre o Apodo</label>
-      <input type="text" id="nombre" name="nombre" disabled>
+      <input type="text" id="nombre" name="nombre" value="<?= $nombre_apodo ?>" disabled>
 
       <label>Teléfono</label>
-      <input type="text" id="telefono" name="telefono" disabled>
+      <input type="text" id="telefono" name="telefono" value="<?= $telefono ?>" disabled>
 
       <label>Email</label>
-      <input type="email" id="email" name="email" disabled>
+      <input type="email" id="email" name="email" value="<?= $email ?>" disabled>
 
       <div class="botones">
-        <button type="button" id="btnEditar">Editar</button>
-        <button type="submit" id="btnGuardar" disabled>Guardar</button>
+        <button type="button" id="btnEditar">✏️ Editar</button>
+        <button type="submit" id="btnGuardar" disabled>💾 Guardar</button>
       </div>
     </form>
   </div>
 
-  <!-- Modal cambio de avatar -->
+  <!-- 🔹 Modal cambio de avatar -->
   <div class="modal" id="modalAvatar">
     <div class="modal-content">
       <h2>Elegí una opción</h2>
@@ -244,53 +312,42 @@ if (!isset($_SESSION['id_usuario'])) {
   </div>
 
   <script src="componentes/menu_cliente.js" defer></script>
-
   <script>
-    // --- Cargar datos del perfil ---
-    async function cargarPerfil() {
-      try {
-        const res = await fetch("../php/panel_cliente/perfil_datos.php");
-        const data = await res.json();
-        console.log("Respuesta del servidor (perfil):", data);
-
-        if (!data.success) {
-          alert("⚠️ No se pudieron cargar los datos del perfil.");
-          return;
-        }
-
-        const nombre = data.data.nombre_apodo || data.data.nombre || "Sin nombre";
-        const telefono = data.data.telefono || "";
-        const email = data.data.email || "";
-        const avatarPath = data.data.selfie_avatar?.trim() || "../assets/img/avatars/avatar1.png";
-
-        document.getElementById("nombre").value = nombre;
-        document.getElementById("telefono").value = telefono;
-        document.getElementById("email").value = email;
-        document.getElementById("userAvatar").src = avatarPath;
-
-      } catch (err) {
-        console.error("Error al cargar el perfil:", err);
-        alert("Error de conexión con el servidor.");
-      }
-    }
-
-    cargarPerfil();
-
-    // --- Modal y edición ---
-    const modal = document.getElementById("modalAvatar");
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("perfilForm");
+    const btnEditar = document.getElementById("btnEditar");
+    const btnGuardar = document.getElementById("btnGuardar");
     const btnCambiarAvatar = document.getElementById("btnCambiarAvatar");
+    const inputNombre = document.getElementById("nombre");
+    const inputTel = document.getElementById("telefono");
+    const inputEmail = document.getElementById("email");
+    const inputAvatar = document.getElementById("selfie_avatar");
+    const avatarImg = document.getElementById("userAvatar");
+
+    const modal = document.getElementById("modalAvatar");
     const btnSelfie = document.getElementById("btnSelfie");
     const btnElegirAvatar = document.getElementById("btnElegirAvatar");
     const video = document.getElementById("videoSelfie");
     const avatarGallery = document.getElementById("avatarGallery");
-    const avatar = document.getElementById("userAvatar");
-    const hiddenAvatar = document.getElementById("selfie_avatar");
 
+    let editMode = false;
+
+    function setEditMode(on) {
+      editMode = on;
+      [inputNombre, inputTel, inputEmail].forEach(i => i.disabled = !on);
+      btnGuardar.disabled = !on;
+      btnEditar.textContent = on ? "Cancelar" : "✏️ Editar";
+      if (on) inputNombre.focus();
+    }
+
+    btnEditar.addEventListener("click", () => setEditMode(!editMode));
+
+    // === Modal Avatar ===
     btnCambiarAvatar.addEventListener("click", () => modal.classList.add("active"));
     document.getElementById("btnCerrarModal").addEventListener("click", () => {
       modal.classList.remove("active");
-      avatarGallery.style.display = "none";
       video.style.display = "none";
+      avatarGallery.style.display = "none";
       if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
     });
 
@@ -307,8 +364,8 @@ if (!isset($_SESSION['id_usuario'])) {
           const ctx = canvas.getContext("2d");
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imgData = canvas.toDataURL("image/png");
-          avatar.src = imgData;
-          hiddenAvatar.value = imgData;
+          avatarImg.src = imgData;
+          inputAvatar.value = imgData;
           modal.classList.remove("active");
           stream.getTracks().forEach(t => t.stop());
         }, { once: true });
@@ -324,33 +381,35 @@ if (!isset($_SESSION['id_usuario'])) {
 
     document.querySelectorAll("#avatarGallery img").forEach(img => {
       img.addEventListener("click", () => {
-        avatar.src = img.src;
-        hiddenAvatar.value = img.src;
+        avatarImg.src = img.src;
+        inputAvatar.value = img.src;
         modal.classList.remove("active");
       });
     });
 
-    // --- Edición del perfil ---
-    const form = document.getElementById("perfilForm");
-    const btnEditar = document.getElementById("btnEditar");
-    const btnGuardar = document.getElementById("btnGuardar");
-
-    btnEditar.addEventListener("click", () => {
-      document.querySelectorAll("#perfilForm input:not([type=hidden])").forEach(i => i.disabled = false);
-      btnGuardar.disabled = false;
-    });
-
+    // === Guardar Perfil ===
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (!editMode) return;
+
       const formData = new FormData(form);
-      const resp = await fetch("../php/panel_cliente/perfil_actualizar.php", {
-        method: "POST",
-        body: formData
-      });
-      const data = await resp.json();
-      alert(data.message);
-      if (data.success) window.location.reload();
+      try {
+        const res = await fetch("../php/panel_cliente/perfil_actualizar.php", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("✅ Perfil actualizado correctamente");
+          setEditMode(false);
+        } else {
+          alert("⚠️ " + data.message);
+        }
+      } catch {
+        alert("❌ Error al guardar el perfil.");
+      }
     });
+  });
   </script>
 </body>
 </html>

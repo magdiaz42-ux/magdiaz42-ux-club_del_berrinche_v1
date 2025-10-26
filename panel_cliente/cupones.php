@@ -114,7 +114,7 @@ if (!isset($_SESSION['id_usuario'])) {
       gap: 20px;
     }
 
-    /* === CUPONES CURVADOS CON EFECTO 3D === */
+    /* === CUPONES === */
     .cupon {
       position: relative;
       padding: 18px 22px;
@@ -124,7 +124,6 @@ if (!isset($_SESSION['id_usuario'])) {
       color: #fff;
       box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -4px 10px rgba(0,0,0,0.25);
       border: 2px solid rgba(255,255,255,0.2);
-      background: linear-gradient(145deg, #555, #333);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -133,46 +132,56 @@ if (!isset($_SESSION['id_usuario'])) {
       box-shadow: 0 0 25px rgba(0,255,242,0.5);
     }
 
-    /* === COLORES POR TIPO === */
+    /* === COLORES SEGÚN TIPO === */
     .cupon.tipo-fijo {
-      background: linear-gradient(145deg, #ff4d6d, #c9184a);
+      background: linear-gradient(135deg, #ff0040, #a0002f);
+      border-color: rgba(255,0,80,0.6);
+      box-shadow: 0 0 20px rgba(255,0,80,0.4);
     }
 
     .cupon.tipo-random {
-      background: linear-gradient(145deg, #ffd166, #ffb703);
+      background: linear-gradient(135deg, #ffb703, #ff7300);
+      border-color: rgba(255,180,0,0.7);
+      box-shadow: 0 0 20px rgba(255,150,0,0.4);
     }
 
     .cupon.tipo-extra {
-      background: linear-gradient(145deg, #06d6a0, #118ab2);
+      background: linear-gradient(135deg, #00fff2, #0037ff);
+      border-color: rgba(0,255,242,0.6);
+      box-shadow: 0 0 25px rgba(0,255,242,0.5);
     }
 
-    /* Tipografía con efecto suave 3D */
+    /* === TEXTO VISIBLE === */
     .cupon h3 {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 800;
       margin: 0 0 8px;
       color: #fff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow:
+        0 0 8px rgba(0,0,0,0.9),
+        0 0 15px rgba(0,0,0,0.6),
+        0 0 25px rgba(255,255,255,0.2);
     }
 
     .cupon p {
-      font-size: 0.9rem;
-      margin: 4px 0;
-      color: rgba(255,255,255,0.9);
+      font-size: 1rem;
+      margin: 6px 0;
+      color: #f0f0f0;
       font-weight: 500;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      text-shadow: 0 0 5px rgba(0,0,0,0.8);
     }
 
     .cupon .vencimiento {
       font-size: 0.8rem;
       margin-top: 6px;
-      color: rgba(255,255,255,0.85);
+      color: #fff;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
       font-weight: 600;
+      opacity: 0.9;
     }
 
-    /* Bordes tipo ticket */
+    /* === BORDES TIPO TICKET === */
     .cupon::before,
     .cupon::after {
       content: "";
@@ -181,7 +190,7 @@ if (!isset($_SESSION['id_usuario'])) {
       transform: translateY(-50%);
       width: 22px;
       height: 22px;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0,0,0,0.9);
       border-radius: 50%;
     }
 

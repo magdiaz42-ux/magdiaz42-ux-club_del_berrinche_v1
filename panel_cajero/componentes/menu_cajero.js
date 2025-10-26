@@ -1,37 +1,25 @@
-// === MENU CAJERO (LÓGICA GLOBAL) ===
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ menu_cajero.js ejecutado");
 
-menuBtn.addEventListener("click", () => {
-  menuBtn.classList.toggle("active");
-  sidebar.classList.toggle("active");
-});
+  const menuBtn = document.getElementById("menuBtn");
+  const sidebar = document.getElementById("sidebar");
 
-// === Navegación ===
-document.querySelectorAll(".menu-links button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const section = btn.getAttribute("data-section");
-    switch (section) {
-      case "generar":
-        window.location.href = "generar_ticket.php";
-        break;
-      case "ver":
-        window.location.href = "ver_codigos.php";
-        break;
-      default:
-        alert(`Sección "${section}" en desarrollo 🧩`);
-    }
-    sidebar.classList.remove("active");
-    menuBtn.classList.remove("active");
+  if (!menuBtn || !sidebar) {
+    console.error("❌ No se encontró el botón o el sidebar");
+    return;
+  }
+
+  menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    console.log("🎯 Click en menú hamburguesa");
+    menuBtn.classList.toggle("active");
+    sidebar.classList.toggle("active");
   });
-});
 
-// === Cerrar sesión ===
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    if (confirm("¿Seguro que querés cerrar sesión?")) {
-      fetch("../php/logout.php").then(() => (window.location.href = "../login.php"));
+  document.addEventListener("click", (e) => {
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+      sidebar.classList.remove("active");
+      menuBtn.classList.remove("active");
     }
   });
-}
+});

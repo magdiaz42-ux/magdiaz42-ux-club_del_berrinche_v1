@@ -1,123 +1,115 @@
+/* === BOTÓN HAMBURGUESA === */
 .menu-btn {
   position: fixed;
-  top: 25px;
-  left: 15px;
-  z-index: 200;
-  cursor: pointer;
-  width: 50px;
-  height: 40px;
+  top: 25px; left: 15px;
+  width: 50px; height: 40px;
   background: rgba(10, 10, 20, 0.95);
   border-right: 1px solid rgba(0,255,242,0.4);
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-radius: 0 10px 10px 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  z-index: 5000;
   box-shadow: 0 0 20px rgba(0,255,242,0.25);
-  transition: all 0.4s ease;
 }
-
 .menu-btn div {
-  width: 24px;
-  height: 3px;
-  background: #00fff2;
-  border-radius: 2px;
-  margin: 3px 0;
-  transition: all 0.3s ease;
+  width: 24px; height: 3px; margin: 3px 0;
+  background: #00fff2; border-radius: 2px; transition: 0.3s;
 }
+.menu-btn.active div:nth-child(1) { transform: rotate(45deg) translate(6px, 5px); }
+.menu-btn.active div:nth-child(2) { opacity: 0; }
+.menu-btn.active div:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
 
-.menu-btn.active div:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 5px);
-}
-.menu-btn.active div:nth-child(2) {
-  opacity: 0;
-}
-.menu-btn.active div:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px);
-}
-
+/* === PANEL LATERAL === */
 .sidebar {
   position: fixed;
   top: 0;
-  left: -280px;
+  left: -100%; /* 🔥 completamente oculto al inicio */
   width: 260px;
   height: 100%;
-  background: rgba(10, 10, 20, 0.95);
+  background: rgba(10, 10, 20, 0.97);
+  backdrop-filter: blur(8px);
+  border-right: 1px solid rgba(0,255,242,0.25);
   box-shadow: 0 0 50px rgba(0,255,242,0.25);
-  transition: left 0.4s ease;
-  z-index: 150;
-  padding: 25px 20px 70px;
+  transition: left 0.35s ease-in-out, opacity 0.3s ease;
+  z-index: 4000;
+  padding: 25px 20px;
+  text-align: center;
+  visibility: hidden;
+  opacity: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  border-right: 1px solid rgba(0,255,242,0.25);
-  box-sizing: border-box;
+  justify-content: flex-start;
 }
-
 .sidebar.active {
   left: 0;
+  visibility: visible;
+  opacity: 1;
 }
 
+/* === CONTENIDO === */
 .avatar {
-  width: 110px;
-  height: 110px;
+  width: 110px; height: 110px;
   border-radius: 50%;
   border: 2px solid #00fff2;
-  object-fit: cover;
-  box-shadow: 0 0 20px rgba(0,255,242,0.4);
   margin-bottom: 10px;
 }
-
 .nombre-usuario {
   color: #00fff2;
-  font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 20px;
   text-align: center;
 }
 
 .menu-links {
+  flex-grow: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 100%;
+  justify-content: flex-start;
 }
-
 .menu-links button {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(0,255,242,0.3);
-  border-radius: 25px;
-  color: #fff;
+  width: 100%;
   padding: 12px;
-  font-weight: 500;
+  border-radius: 25px;
+  border: 1px solid rgba(0,255,242,0.3);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
   cursor: pointer;
-  text-align: center;
-  transition: all 0.25s ease;
+  margin-bottom: 10px;
+  transition: 0.3s;
 }
-
 .menu-links button:hover {
-  background: linear-gradient(90deg, #0037ff, #00fff2);
-  box-shadow: 0 0 20px rgba(0,255,242,0.4);
-  transform: scale(1.05);
+  background: linear-gradient(90deg,#0037ff,#00fff2);
+  box-shadow: 0 0 15px rgba(0,255,242,0.4);
 }
 
+/* === BOTÓN CERRAR SESIÓN === */
 .logout-btn {
   width: 100%;
-  background: rgba(255,0,0,0.1);
-  border: 1px solid rgba(255,60,60,0.4);
+  background: linear-gradient(90deg, #ff0040, #a0002f);
+  border: 1px solid rgba(255,80,80,0.5);
+  color: #fff;
+  font-weight: 700;
   border-radius: 25px;
-  color: #ff8080;
-  font-weight: 600;
   padding: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 20px rgba(255,0,80,0.4);
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: auto;
+  margin-top: 30px; /* 🔥 distancia justa del último botón */
+  align-self: center; /* centrado en el eje horizontal */
+}
+.logout-btn:hover {
+  background: linear-gradient(90deg, #ff3366, #ff0040);
+  box-shadow: 0 0 30px rgba(255,0,80,0.6);
+  transform: scale(1.03);
 }
 
-.logout-btn:hover {
-  background: linear-gradient(90deg, #ff0040, #ff8080);
-  color: #fff;
-  box-shadow: 0 0 20px rgba(255,80,80,0.5);
-  transform: scale(1.05);
+/* === RESPONSIVE === */
+@media (max-height: 600px) {
+  .sidebar { padding-bottom: 20px; }
+  .logout-btn { margin-top: 20px; }
 }

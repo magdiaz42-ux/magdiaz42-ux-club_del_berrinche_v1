@@ -1,46 +1,49 @@
 <?php
 session_start();
+header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexion_auto.php';
 
-// --- Validar sesión ---
+// --- Verificar sesión ---
 if (!isset($_SESSION['id_usuario'])) {
-  echo json_encode(["success" => false, "message" => "Sesión no iniciada."]);
+  echo json_encode(["success" => false, "message" => "Sesión no iniciada"]);
   exit;
 }
 
 $id_usuario = $_SESSION['id_usuario'];
 
-// --- Obtener datos del usuario ---
-$sql = "SELECT nombre_apodo, email, telefono, selfie_avatar 
-        FROM usuarios 
-        WHERE id = ? LIMIT 1";
+// --- Obtener datos del usuario desde la base ---
+$sql = "SELECT nombre_apodo, selfie_avatar FROM usuarios WHERE id = ? LIMIT 1";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
 $res = $stmt->get_result();
 
 if ($res->num_rows === 0) {
-  echo json_encode(["success" => false, "message" => "Usuario no encontrado."]);
+  echo json_encode(["success" => false, "message" => "Usuario no encontrado"]);
+  $stmt->close();
+  $conn->close();
   exit;
 }
 
 $usuario = $res->fetch_assoc();
+$stmt->close();
+$conn->close();
 
-// --- Si no tiene avatar, usar uno por defecto ---
-$avatar = $usuario['selfie_avatar'];
-if (empty($avatar)) {
-  $avatar = "../assets/img/avatars/avatar1.png";
+// --- Validar y normalizar avatar ---
+$avatar = trim($usuario['selfie_avatar'] ?? '');
+$ruta_base = __DIR__ . '/../'; // base del proyecto
+
+if ($avatar === '' || !file_exists($ruta_base . $avatar)) {
+  // Si no tiene selfie o el archivo no existe, usamos el avatar default
+  $avatar = 'assets/img/avatars/avatar_default.png';
 }
 
-// --- Forzar encabezado JSON para que el fetch lo lea bien ---
-header('Content-Type: application/json; charset=utf-8');
-
+// --- Respuesta final JSON ---
 echo json_encode([
   "success" => true,
   "data" => [
-    "nombre_apodo" => $usuario['nombre_apodo'],
-    "email" => $usuario['email'],
-    "telefono" => $usuario['telefono'],
-    "avatar" => $avatar
+    "nombre_apodo" => $usuario['nombre_apodo'] ?? 'Cliente',
+    "selfie_avatar" => $avatar // usamos el mismo nombre de clave que espera el menú
   ]
 ]);
+?>
