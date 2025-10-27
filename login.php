@@ -1,9 +1,11 @@
 <?php
-// Si el usuario ya está logueado, redirigirlo a su panel
 session_start();
+echo "<!-- Ruta actual: " . __DIR__ . " -->";
+
+// Si el usuario ya está logueado, redirigirlo a su panel
 if (isset($_SESSION['rol'])) {
   switch ($_SESSION['rol']) {
-    case 'admin': header("Location: panel_admin/panel_admin.php"); exit;
+    case 'admin': header("Location: panel_admin/admin_dashboard.php"); exit;
     case 'dj': header("Location: panel_dj/panel_dj.php"); exit;
     case 'cajero': header("Location: panel_cajero/panel_cajero.php"); exit;
     case 'karaoke': header("Location: panel_karaoke/panel_karaoke.php"); exit;
@@ -20,7 +22,6 @@ if (isset($_SESSION['rol'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Iniciar sesión | El Club del Berrinche</title>
 
-  <!-- Fuente y estilo base -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
 
@@ -147,6 +148,7 @@ if (isset($_SESSION['rol'])) {
     <h1>El Club del Berrinche</h1>
     <p>Ingresá tu correo o teléfono para acceder</p>
 
+    <!-- ✅ Acción correcta -->
     <form action="php/login_procesar.php" method="POST">
       <input name="usuario" class="input" placeholder="Correo o teléfono" required />
       <input name="password" type="password" class="input" placeholder="Contraseña" required />
@@ -164,7 +166,7 @@ if (isset($_SESSION['rol'])) {
             case 'pass_incorrecta': echo '❌ Contraseña incorrecta.'; break;
             case 'usuario_inactivo': echo '🚫 Usuario inactivo. Consultá en el local.'; break;
             case 'acceso_denegado': echo '🔒 Acceso no autorizado.'; break;
-            default: echo '❌ Error al iniciar sesión.';
+            default: echo '❌ Error al iniciar sesión.'; break;
           }
         ?>
       </p>

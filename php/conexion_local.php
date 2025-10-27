@@ -9,3 +9,4 @@ if ($conn->connect_error) {
   die("Error de conexión local: " . $conn->connect_error);
 }
 $conn->set_charset("utf8mb4");
+?>

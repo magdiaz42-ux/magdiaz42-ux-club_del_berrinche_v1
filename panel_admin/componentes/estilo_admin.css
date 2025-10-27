@@ -1,0 +1,165 @@
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: url("../../assets/img/fondo-hexagonos.jpg") no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 0;
+}
+
+/* Menú hamburguesa */
+.menu-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  cursor: pointer;
+}
+.menu-btn div {
+  width: 30px;
+  height: 3px;
+  background: #00fff2;
+  margin: 6px 0;
+  transition: 0.3s;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -240px;
+  width: 240px;
+  height: 100%;
+  background: rgba(10, 10, 25, 0.95);
+  backdrop-filter: blur(10px);
+  transition: left 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+  box-shadow: 0 0 30px rgba(0,255,242,0.2);
+}
+.sidebar.active { left: 0; }
+
+.sidebar .avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  border: 2px solid #00fff2;
+}
+.nombre-usuario {
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #00fff2;
+}
+.menu-opciones {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+.menu-opciones li a {
+  display: block;
+  text-decoration: none;
+  color: #fff;
+  padding: 12px 20px;
+  border-left: 3px solid transparent;
+  transition: 0.2s;
+}
+.menu-opciones li a:hover {
+  background: rgba(0,255,242,0.1);
+  border-left: 3px solid #00fff2;
+}
+
+/* Contenido */
+.contenido {
+  position: relative;
+  z-index: 1;
+  padding: 100px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.titulo-principal {
+  color: #00fff2;
+  text-shadow: 0 0 25px #00fff2, 0 0 50px #4b00ff;
+  margin-bottom: 8px;
+}
+.subtitulo {
+  color: #ccc;
+  margin-bottom: 40px;
+}
+
+/* Tarjetas */
+.tarjetas-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1000px;
+}
+.card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 25px;
+  width: 260px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,255,242,0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 35px rgba(0,255,242,0.4);
+}
+.card h3 {
+  color: #00fff2;
+  margin-bottom: 10px;
+}
+.card p {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Botones */
+.btn {
+  background: linear-gradient(90deg, #0037ff, #00fff2);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 25px;
+  box-shadow: 0 0 25px rgba(0,255,242,.5);
+  cursor: pointer;
+  transition: 0.2s transform, 0.2s box-shadow;
+  text-decoration: none;
+}
+.btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 35px rgba(0,255,242,.7);
+}
+
+.acciones-rapidas {
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .tarjetas-dashboard {
+    flex-direction: column;
+    align-items: center;
+  }
+}
